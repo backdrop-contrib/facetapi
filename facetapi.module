@@ -66,7 +66,7 @@ define('FACETAPI_REGEX_DATE', '/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})
 define('FACETAPI_REGEX_DATE_RANGE', '/^\[(' . trim(FACETAPI_REGEX_DATE, '/^$') . ') TO (' . trim(FACETAPI_REGEX_DATE, '/^$') . ')\]$/');
 
 // Calls block specific hooks and overrides.
-require_once dirname(__FILE__) . '/facetapi.block.inc';
+module_load_include('inc', 'facetapi', 'facetapi.block');
 
 /**
  * Implements hook_facetapi_hook_info().
