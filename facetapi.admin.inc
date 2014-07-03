@@ -522,6 +522,22 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
     '#description' => t('The action to take when a facet has no items.'),
   );
 
+  $form['widget']['facet_more_text'] = array(
+    '#type' => 'textfield',
+    '#prefix' => '<div class="facetapi-more-text-setting">',
+    '#suffix' => '</div>',
+    '#title' => t('Facet "more" link text'),
+    '#default_value' => $facet_settings->settings['facet_more_text'],
+  );
+
+  $form['widget']['facet_fewer_text'] = array(
+    '#type' => 'textfield',
+    '#prefix' => '<div class="facetapi-fewer-text-setting">',
+    '#suffix' => '</div>',
+    '#title' => t('Facet "fewer" link text'),
+    '#default_value' => $facet_settings->settings['facet_fewer_text'],
+  );
+
   ////
   ////
   //// Global settings

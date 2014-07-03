@@ -778,6 +778,8 @@ abstract class FacetapiAdapter {
         'sort_weight' => array(),
         'sort_order' => array(),
         'empty_behavior' => 'none',
+        'facet_more_text' => 'Show more',
+        'facet_fewer_text' => 'Show fewer',
       );
 
       // Apply default sort info only if the configuration is "new".
