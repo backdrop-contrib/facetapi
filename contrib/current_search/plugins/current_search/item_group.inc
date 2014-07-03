@@ -36,7 +36,6 @@ class CurrentSearchGroup extends CurrentSearchItem {
 
     // Initializes links attributes, adds rel="nofollow" if configured.
     $attributes = ($this->settings['nofollow']) ? array('rel' => 'nofollow') : array();
-    $attributes += array('class' => array());
 
     // Gets the translated pattern with token replacements in tact.
     $field_pattern = $this->translate('field_pattern', $this->settings['field_pattern']);
