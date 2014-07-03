@@ -251,31 +251,31 @@ function facetapi_ctools_plugin_type() {
 function facetapi_theme() {
   return array(
     'facetapi_title' => array(
-      'arguments' => array('title' => NULL, 'facet' => array()),
+      'variables' => array('title' => NULL, 'facet' => array()),
       'file' => 'facetapi.theme.inc',
     ),
     'facetapi_facet_missing' => array(
-      'arguments' => array('field_name' => NULL),
+      'variables' => array('field_name' => NULL),
       'file' => 'facetapi.theme.inc',
     ),
     'facetapi_count' => array(
-      'arguments' => array('count' => NULL),
+      'variables' => array('count' => NULL),
       'file' => 'facetapi.theme.inc',
     ),
     'facetapi_link_inactive' => array(
-      'arguments' => array('text' => NULL, 'path' => NULL, 'options' => array(), 'count' => 0),
+      'variables' => array('text' => NULL, 'path' => NULL, 'options' => array(), 'count' => 0),
       'file' => 'facetapi.theme.inc',
     ),
     'facetapi_link_active' => array(
-      'arguments' => array('text' => NULL, 'path' => NULL, 'options' => array()),
+      'variables' => array('text' => NULL, 'path' => NULL, 'options' => array()),
       'file' => 'facetapi.theme.inc',
     ),
     'facetapi_deactivate_widget' => array(
-      'arguments' => array('text' => NULL),
+      'variables' => array('text' => NULL),
       'file' => 'facetapi.theme.inc',
     ),
     'facetapi_accessible_markup' => array(
-      'arguments' => array('text' => NULL, 'active' => NULL),
+      'variables' => array('text' => NULL, 'active' => NULL),
       'file' => 'facetapi.theme.inc',
     ),
     'facetapi_realm_settings_table' => array(
