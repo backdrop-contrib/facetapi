@@ -1485,6 +1485,8 @@ class FacetapiFacetProcessor {
     }
 
     // Iterates over the render array and merges in defaults.
+    // @see https://www.drupal.org/node/1398036 for why array_keys() is used
+    // instead of element_children().
     foreach (array_keys($build) as $value) {
       $item_defaults = array(
         '#markup' => $value,
