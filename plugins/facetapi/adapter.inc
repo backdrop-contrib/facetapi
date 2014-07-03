@@ -1485,7 +1485,7 @@ class FacetapiFacetProcessor {
     }
 
     // Iterates over the render array and merges in defaults.
-    foreach (element_children($build) as $value) {
+    foreach (array_keys($build) as $value) {
       $item_defaults = array(
         '#markup' => $value,
         '#indexed_value' => $value,
