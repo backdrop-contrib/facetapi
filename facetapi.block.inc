@@ -275,7 +275,9 @@ function facetapi_hash_delta($delta) {
   // Ensure hashes are URL safe and alpha-numeric.
   // @see http://drupal.org/node/1355270
   $hash = substr(drupal_hash_base64($delta), 0, 32);
-  return strtr($hash, array('-' => '0', '_' => '1'));
+  $hash = strtr($hash, array('-' => '0', '_' => '1'));
+  drupal_alter('facetapi_hash', $hash, $delta);
+  return $hash;
 }
 
 /**
