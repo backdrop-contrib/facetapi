@@ -1070,6 +1070,10 @@ function facetapi_facet_filters_form_submit($form, &$form_state) {
  */
 function facetapi_facet_dependencies_form($form, &$form_state, FacetapiAdapter $adapter, array $realm, array $dependencies) {
 
+  // Ensure that the CTools plugin component is loaded.
+  // @see https://www.drupal.org/node/2122119
+  module_load_include('inc', 'ctools','includes/plugins');
+
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
   $facet = facetapi_facet_load(arg(6), $adapter->getSearcher());
