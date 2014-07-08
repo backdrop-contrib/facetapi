@@ -604,6 +604,22 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
     '#description' => t('Do not process hierarchical relationships and display facet items as a flat list.'),
   );
 
+  $form['global']['individual_parent'] = array(
+    '#type' => 'radios',
+    '#access' => $facet['hierarchy callback'],
+    '#title' => t('Treat parent items as individual facet items'),
+    '#prefix' => '<div class="facetapi-global-setting">',
+    '#suffix' => '</div>',
+    '#default_value' => $global_settings->settings['individual_parent'],
+    '#options' => array(0 => t('No'), 1 => t('Yes')),
+    '#description' => t('Parent items will not be active when selecting a children and if active, they will not clear their children facet selection.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="global[flatten]"]' => array('value' => 0),
+      ),
+    ),
+  );
+
   $form['global']['facet_mincount'] = array(
     '#type' => 'textfield',
     '#access' => $facet['facet mincount allowed'] && $adapter->supportsFacetMincount(),
