@@ -1521,6 +1521,10 @@ class FacetapiFacetProcessor {
         $this->map = call_user_func($this->facet['map callback'], $values, $this->facet['map options']);
         // Normalize all mapped values to a two element array.
         foreach ($this->map as $key => $value) {
+          if ($value === NULL) {
+            unset($build[$key]);
+            continue;
+          }
           if (!is_array($value)) {
             $this->map[$key] = array();
             $this->map[$key]['#markup'] = $value;
