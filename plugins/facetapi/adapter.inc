@@ -779,6 +779,7 @@ abstract class FacetapiAdapter {
         'sort_weight' => array(),
         'sort_order' => array(),
         'empty_behavior' => 'none',
+        'display_count' => TRUE,
         'facet_more_text' => 'Show more',
         'facet_fewer_text' => 'Show fewer',
       );
