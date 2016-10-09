@@ -726,6 +726,7 @@ abstract class FacetapiAdapter {
       $settings->realm = (string) $realm_name;
       $settings->facet = $facet_name;
       $settings->enabled = 0;
+      $settings->hash = facetapi_hash_delta($name);
       $settings->settings = array();
     }
     else {
