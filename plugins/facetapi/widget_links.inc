@@ -121,6 +121,11 @@ class FacetapiWidgetLinks extends FacetapiWidget {
       // Add an ID to identify this link.
       $variables['options']['attributes']['id'] = drupal_html_id('facetapi-link');
 
+      // If the item is active, the li is active
+      if ($item['#active']) {
+        $row['class'][] = 'active';
+      }
+
       // If the item has no children, it is a leaf.
       if (empty($item['#item_children'])) {
         $row['class'][] = 'leaf';

@@ -56,7 +56,9 @@ class CurrentSearchItemActive extends CurrentSearchItem {
       );
 
       // Renders the active link.
-      $items[] = theme('facetapi_link_active', $variables);
+      $row['data'] = theme('facetapi_link_active', $variables);
+      $row['class'][] = 'active';
+      $items[] = $row;
     }
 
     // If there are items, return the render array.
