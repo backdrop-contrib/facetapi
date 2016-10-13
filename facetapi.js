@@ -41,14 +41,14 @@ Drupal.facetapi.applyLimit = function(settings) {
     $('ul#' + settings.id).filter(function() {
       return $(this).find('li').length > settings.limit;
     }).each(function() {
-      $('<a href="#" class="facetapi-limit-link"></a>').text(Drupal.t(settings.showMoreText)).click(function() {
+      $('<a href="#" class="facetapi-limit-link"></a>').text(settings.showMoreText).click(function() {
         if ($(this).siblings().find('li:hidden').length > 0) {
           $(this).siblings().find('li:gt(' + limit + ')').slideDown();
-          $(this).addClass('open').text(Drupal.t(settings.showFewerText));
+          $(this).addClass('open').text(settings.showFewerText);
         }
         else {
           $(this).siblings().find('li:gt(' + limit + ')').slideUp();
-          $(this).removeClass('open').text(Drupal.t(settings.showMoreText));
+          $(this).removeClass('open').text(settings.showMoreText);
         }
         return false;
       }).insertAfter($(this));
