@@ -112,7 +112,7 @@ abstract class FacetapiWidget {
   /**
    * Initializes the build, must be invoked prior to executing this widget.
    *
-   * This method is called automatically by FacetapiFacet::build() and shoud
+   * This method is called automatically by FacetapiFacet::build() and should
    * rarely be invoked outside of that context. It is responsible for getting
    * the base render array stored in the FacetapiFacet object and appending it
    * to the container that will be returned, sorting the facets, and adding some
@@ -127,8 +127,9 @@ abstract class FacetapiWidget {
     $searcher = $this->facet->getAdapter()->getSearcher();
 
     // Initialize the render array.
+    $title_override = isset($this->settings->settings['title_override']) && !empty($this->settings->settings['title_override']);
     $this->build = array(
-      '#title' => $this->facet['label'],
+      '#title' => $title_override ? $this->settings->settings['title'] : $this->facet['label'],
       '#description' => $this->facet['description'],
       '#weight' => $this->facet['weight'],
       '#adapter' => $this->facet->getAdapter(),
