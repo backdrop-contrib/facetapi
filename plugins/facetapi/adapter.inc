@@ -1308,8 +1308,14 @@ class FacetapiFacet implements ArrayAccess {
     else {
       // Instantiate the empty behavior plugin.
       $id = $settings->settings['empty_behavior'];
-      $class = ctools_plugin_load_class('facetapi', 'empty_behaviors', $id, 'handler');
-      $empty_plugin = new $class($settings);
+      if ($class = ctools_plugin_load_class('facetapi', 'empty_behaviors', $id, 'handler')) {
+        $empty_plugin = new $class($settings);
+      }
+      // Fallback for the case when empty_behavior plugin is not available.
+      else {
+        $class = ctools_plugin_load_class('facetapi', 'empty_behaviors', 'none', 'handler');
+        $empty_plugin = new $class($settings);
+      }
       // Execute the empty behavior plugin.
       $build = $widget_plugin->getBuild();
       $build[$this['field alias']] = $empty_plugin->execute();
