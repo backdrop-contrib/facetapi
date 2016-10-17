@@ -352,6 +352,10 @@ function facetapi_i18n_string_list($group) {
           // Avoid adding duplicate strings by using the string itself as key.
           $strings['facetapi']['link_text'][$settings->settings['facet_more_text']]['text'] = $settings->settings['facet_more_text'];
           $strings['facetapi']['link_text'][$settings->settings['facet_fewer_text']]['text'] = $settings->settings['facet_fewer_text'];
+          // If title has been overridden, we should translate it.
+          if ($settings->settings['title_override']) {
+            $strings['facetapi']['title_text'][$settings->settings['title']]['text'] = $settings->settings['title'];
+          }
         }
       }
     }

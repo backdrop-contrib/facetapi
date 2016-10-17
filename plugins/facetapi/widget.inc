@@ -126,10 +126,19 @@ abstract class FacetapiWidget {
     // Capture searcher for code readability.
     $searcher = $this->facet->getAdapter()->getSearcher();
 
-    // Initialize the render array.
+    // Prepare the title
+    $title = $this->facet['label'];
     $title_override = isset($this->settings->settings['title_override']) && !empty($this->settings->settings['title_override']);
+    if ($title_override) {
+      $title = $this->settings->settings['title'];
+      if (module_exists('i18n_string')) {
+        $title = i18n_string_translate('facetapi:title_text:' . $title . ':text', $title);
+      }
+    }
+
+    // Initialize the render array.
     $this->build = array(
-      '#title' => $title_override ? $this->settings->settings['title'] : $this->facet['label'],
+      '#title' => $title,
       '#description' => $this->facet['description'],
       '#weight' => $this->facet['weight'],
       '#adapter' => $this->facet->getAdapter(),
