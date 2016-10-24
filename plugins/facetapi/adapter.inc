@@ -417,9 +417,8 @@ abstract class FacetapiAdapter {
   /**
    * Returns a facet's active items.
    *
-   * @param array|string $facet
-   *   Either the facet definition as returned by facetapi_facet_load() or the
-   *   machine readable name of the facet.
+   * @param array $facet
+   *   The facet definition as returned by facetapi_facet_load().
    *
    * @return array
    *   An associative array containing (but not limited to):
