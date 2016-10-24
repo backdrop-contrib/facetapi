@@ -132,7 +132,7 @@ abstract class FacetapiWidget {
     if ($title_override) {
       $title = $this->settings->settings['title'];
       if (module_exists('i18n_string')) {
-        $title = i18n_string_translate('facetapi:title_text:' . $title . ':text', $title);
+        $title = facetapi_i18n_string_translate('facetapi:title_text:' . $title . ':text', $title);
       }
     }
 
@@ -167,8 +167,8 @@ abstract class FacetapiWidget {
     $show_fewer_text = $this->settings->settings['facet_fewer_text'];
 
     if (module_exists('i18n_string')) {
-      $show_more_text = i18n_string_translate('facetapi:link_text:' . $show_more_text . ':text', $show_more_text);
-      $show_fewer_text = i18n_string_translate('facetapi:link_text:' . $show_fewer_text . ':text', $show_fewer_text);
+      $show_more_text = facetapi_i18n_string_translate('facetapi:link_text:' . $show_more_text . ':text', $show_more_text);
+      $show_fewer_text = facetapi_i18n_string_translate('facetapi:link_text:' . $show_fewer_text . ':text', $show_fewer_text);
     }
 
 

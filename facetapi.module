@@ -1221,3 +1221,16 @@ function facetapi_save_facet_enabled(FacetapiAdapter $adapter, array $realm, arr
 function facetapi_save_facet_disabled(FacetapiAdapter $adapter, array $realm, array $facet, $weight = FALSE, $batch_process = FALSE) {
   return facetapi_save_facet_status($adapter, $realm, $facet, FALSE, $weight, $batch_process);
 }
+
+/**
+ * Translates string for FacetAPI.
+ */
+function facetapi_i18n_string_translate($name, $string) {
+  return i18n_string_translate(
+    $name,
+    $string,
+    array(
+      'format' => I18N_STRING_FILTER_XSS
+    )
+  );
+}
