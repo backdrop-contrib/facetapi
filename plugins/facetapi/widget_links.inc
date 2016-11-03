@@ -88,9 +88,7 @@ class FacetapiWidgetLinks extends FacetapiWidget {
   function buildListItems($build) {
     $settings = $this->settings->settings;
 
-    // Initializes links attributes, adds rel="nofollow" if configured.
-    $attributes = ($settings['nofollow']) ? array('rel' => 'nofollow') : array();
-    $attributes += array('class' => $this->getItemClasses());
+    $attributes = array('class' => $this->getItemClasses());
 
     // Builds rows.
     $items = array();
@@ -108,8 +106,6 @@ class FacetapiWidgetLinks extends FacetapiWidget {
         'count' => $settings['display_count'] ? $item['#count'] : NULL,
         'options' => array(
           'attributes' => $attributes,
-          'html' => $item['#html'],
-          'query' => $item['#query'],
         ),
       );
 
@@ -117,9 +113,20 @@ class FacetapiWidgetLinks extends FacetapiWidget {
       if (!$item['#count']) {
         $variables['options']['attributes']['class'][] = 'facetapi-zero-results';
       }
-
-      // Add an ID to identify this link.
-      $variables['options']['attributes']['id'] = drupal_html_id('facetapi-link');
+      // If count more than 0.
+      else {
+        // We need nofollow only for items with non zero results.
+        if ($settings['nofollow']) {
+          // Initializes links attributes, adds rel="nofollow" if configured.
+          $attributes['rel'] = 'nofollow';
+        }
+        // Add an ID to identify this link.
+        $variables['options']['attributes']['id'] = drupal_html_id('facetapi-link');
+        $variables['options'] += array(
+          'html' => $item['#html'],
+          'query' => $item['#query'],
+        );
+      }
 
       // If the item is active, the li is active
       if ($item['#active']) {
