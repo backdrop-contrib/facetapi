@@ -107,7 +107,7 @@ class CurrentSearchItemActive extends CurrentSearchItem {
       );
 
       // Renders the active link.
-      $row['data'] = theme('facetapi_link_active', $variables);
+      $row['data'] = theme('current_search_link_active', $variables);
       $row['class'][] = 'active';
       $items[] = $row;
     }
