@@ -86,7 +86,7 @@ class CurrentSearchItemActive extends CurrentSearchItem {
         ),
       );
 
-      $items[] = theme('facetapi_link_active', $variables);
+      $items[] = theme('current_search_link_active', $variables);
     }
 
     // Adds active facets to the current search block.
