@@ -88,11 +88,14 @@ class FacetapiWidgetLinks extends FacetapiWidget {
   function buildListItems($build) {
     $settings = $this->settings->settings;
 
-    $attributes = array('class' => $this->getItemClasses());
+    $attributes_init = array('class' => $this->getItemClasses());
 
     // Builds rows.
     $items = array();
     foreach ($build as $value => $item) {
+      // Reset attributes for each item.
+      $attributes = $attributes_init;
+
       $row = array('class' => array());
 
       // Allow adding classes via altering.
