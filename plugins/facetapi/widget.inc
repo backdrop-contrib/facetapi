@@ -387,10 +387,7 @@ function facetapi_sort_count(array $a, array $b) {
 function facetapi_sort_indexed(array $a, array $b) {
   $a_value = (isset($a['#indexed_value'])) ? $a['#indexed_value'] : '';
   $b_value = (isset($b['#indexed_value'])) ? $b['#indexed_value'] : '';
-  if ($a_value == $b_value) {
-    return 0;
-  }
-  return ($a_value < $b_value) ? -1 : 1;
+  return strnatcasecmp($a_value, $b_value);
 }
 
 /**
@@ -399,7 +396,7 @@ function facetapi_sort_indexed(array $a, array $b) {
  * @see uasort()
  */
 function facetapi_sort_display(array $a, array $b) {
-  $a_count = (isset($a['#markup'])) ? $a['#markup'] : '';
-  $b_count = (isset($b['#markup'])) ? $b['#markup'] : '';
-  return strcasecmp($a['#markup'], $b['#markup']);
+  $a_value = (isset($a['#markup'])) ? $a['#markup'] : '';
+  $b_value = (isset($b['#markup'])) ? $b['#markup'] : '';
+  return strnatcasecmp($a_value, $b_value);
 }
