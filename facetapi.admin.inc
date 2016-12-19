@@ -1120,7 +1120,7 @@ function facetapi_facet_dependencies_form($form, &$form_state, FacetapiAdapter $
 
   // Ensure that the CTools plugin component is loaded.
   // @see https://www.drupal.org/node/2122119
-  module_load_include('inc', 'ctools','includes/plugins');
+  module_load_include('inc', 'ctools', 'includes/plugins');
 
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
