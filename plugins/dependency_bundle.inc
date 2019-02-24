@@ -34,7 +34,7 @@ class FacetapiDependencyBundle extends FacetapiDependency {
         }
 
         // Check match between the field's bundles and active bundle items.
-        foreach ($this->getEnabledBundleFacets()  as $facet) {
+        foreach ($this->getEnabledBundleFacets()   as $facet) {
           foreach ($facet['field api bundles'] as $entity) {
             $bundles = (isset($field_bundles[$entity])) ? $field_bundles[$entity] : array();
             if (array_intersect_key($this->activeItems[$facet['name']], $bundles)) {
@@ -119,7 +119,7 @@ class FacetapiDependencyBundle extends FacetapiDependency {
           'input[name="bundle"]' => array('value' => 'selected'),
         ),
       ),
-      '#description' => t('At least one of the selected bundles must be active for this facet to be rendered.')
+      '#description' => t('At least one of the selected bundles must be active for this facet to be rendered.'),
     );
   }
 

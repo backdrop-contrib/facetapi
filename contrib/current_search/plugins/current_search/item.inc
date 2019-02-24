@@ -235,7 +235,7 @@ abstract class CurrentSearchItem {
     }
     else {
       return array(
-        '#markup' => '<p>' . t('Install the <a href="http://drupal.org/project/token" target="_blank" title="Token module project page">Token</a> module to view available replacement patterns.') . '</p>'
+        '#markup' => '<p>' . t('Install the <a href="http://drupal.org/project/token" target="_blank" title="Token module project page">Token</a> module to view available replacement patterns.') . '</p>',
       );
     }
   }
@@ -328,11 +328,11 @@ abstract class CurrentSearchItem {
  */
 function current_search_get_classes($setting, array $data = array()) {
   $classes = array();
-  foreach (drupal_explode_tags($setting) as $class) {
+  foreach (backdrop_explode_tags($setting) as $class) {
     if ($data) {
       $class = token_replace($class, $data);
     }
-    $classes[] = drupal_html_class($class);
+    $classes[] = backdrop_html_class($class);
   }
   return $classes;
 }

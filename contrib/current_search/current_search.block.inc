@@ -21,7 +21,7 @@ function current_search_form_block_admin_configure_alter(&$form, &$form_state) {
       '#group' => 'visibility',
       '#weight' => -5,
       '#attached' => array(
-        'js' => array(drupal_get_path('module', 'current_search') . '/current_search.js'),
+        'js' => array(backdrop_get_path('module', 'current_search') . '/current_search.js'),
       ),
     );
 
@@ -65,7 +65,7 @@ function current_search_block_info() {
     if (empty($config->disabled)) {
       $blocks[$config->name] = array(
         'info' => 'Current search: ' . $config->label,
-        'cache' => DRUPAL_NO_CACHE,
+        'cache' => BACKDROP_NO_CACHE,
       );
     }
   }
@@ -146,9 +146,9 @@ function current_search_set_block_searcher($name, $searcher) {
   db_insert('block_current_search')
     ->fields(array('delta', 'searcher'))
     ->values(array(
-      'delta' => $name,
-      'searcher' => $searcher,
-    ))
+    'delta' => $name,
+    'searcher' => $searcher,
+  ))
     ->execute();
 }
 
@@ -206,7 +206,7 @@ function current_search_check_visibility($delta) {
  *   The machine name of the searcher associated with the block.
  */
 function current_search_get_block_searcher($delta) {
-  $map = &drupal_static('current_search_delta_map');
+  $map = &backdrop_static('current_search_delta_map');
   if (NULL === $map) {
     $map = array();
     $result = db_query('SELECT delta, searcher FROM {block_current_search}');

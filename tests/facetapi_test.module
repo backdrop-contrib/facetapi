@@ -19,7 +19,7 @@ function facetapi_test_menu() {
   $items['admin/config/search/facetapi_test'] = array(
     'title' => 'Facet API test',
     'description' => 'Settings for the Facet API module.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('facetapi_test_admin_settings'),
     'access arguments' => array('administer search'),
   );
@@ -129,7 +129,7 @@ function facetapi_test_facetapi_facet_info($searcher_info) {
       'default widget' => 'nonterm',
       'allowed operators' => array(
         FACETAPI_OPERATOR_AND => FALSE,
-        FACETAPI_OPERATOR_OR => TRUE
+        FACETAPI_OPERATOR_OR => TRUE,
       ),
     );
 
@@ -185,4 +185,16 @@ function facetapi_test_search_callback() {
   );
 
   return $build;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function facetapi_test_autoload_info() {
+  return array(
+    'FacetapiTestAdapter' => 'facetapi_test.plugins.inc',
+    'FacetapiTestTerm' => 'facetapi_test.plugins.inc',
+    'FacetapiTestNonterm' => 'facetapi_test.plugins.inc',
+    'FacetapiTestWidgetNonterm' => 'facetapi_test.plugins.inc',
+  );
 }

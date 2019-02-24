@@ -284,7 +284,10 @@ abstract class FacetapiAdapter {
    * @see FacetapiAdapter::setParams()
    */
   public function processActiveItems() {
-    $this->activeItems = array('facet' => array(), 'filter' => array());
+    $this->activeItems = array(
+      'facet' => array(),
+      'filter' => array(),
+    );
 
     // Refresh the query type plugins for all enabled facets.
     $this->queryTypes = $this->loadQueryTypePlugins();
@@ -1042,7 +1045,7 @@ abstract class FacetapiAdapter {
   /**
    * Uses each facet's widget to build the realm's render array.
    *
-   * This array is passed to Drupal's rendering layer for display. The widget
+   * This array is passed to Backdrop's rendering layer for display. The widget
    * plugins are executed to convert the base render arrays constructed by
    * FacetapiAdapter::processFacets() to a realm specific render array.
    *
@@ -1276,7 +1279,7 @@ class FacetapiFacet implements ArrayAccess {
     // Execute the filter plugins.
     // @todo Defensive coding here for filters?
     $enabled_filters = array_filter($settings->settings['filters'], 'facetapi_filter_disabled_filters');
-    uasort($enabled_filters, 'drupal_sort_weight');
+    uasort($enabled_filters, 'backdrop_sort_weight');
     foreach ($enabled_filters as $filter_id => $filter_settings) {
       if ($class = ctools_plugin_load_class('facetapi', 'filters', $filter_id, 'handler')) {
         $filter_plugin = new $class($filter_id, $this->adapter, $settings);
@@ -1327,7 +1330,7 @@ class FacetapiFacet implements ArrayAccess {
 
     // Add JavaScript settings by merging with the others already set.
     $merge_settings['facetapi']['facets'][] = $widget_plugin->getJavaScriptSettings();
-    drupal_add_js($merge_settings, 'setting');
+    backdrop_add_js($merge_settings, 'setting');
 
     // Return render array keyed by the FacetapiWidget::$key property.
     return array($widget_plugin->getKey() => $build);
@@ -1593,8 +1596,7 @@ class FacetapiFacetProcessor {
             }
           }
         }
-      }
-      while ($active);
+      } while ($active);
     }
 
     // Since the children are copied to their parent's "#item_parents" property

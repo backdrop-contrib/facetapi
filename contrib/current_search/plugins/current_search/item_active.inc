@@ -37,7 +37,7 @@ class CurrentSearchItemActive extends CurrentSearchItem {
     if ($this->settings['keys'] && !$keys_link && $keys) {
       $items[] = theme('current_search_keys', array(
         'keys' => $keys,
-        'adapter' => $adapter
+        'adapter' => $adapter,
       ));
     }
     elseif ($this->settings['keys'] && $keys_link && $keys) {
@@ -76,7 +76,7 @@ class CurrentSearchItemActive extends CurrentSearchItem {
       $variables = array(
         'text' => theme('current_search_keys', array(
           'keys' => $keys,
-          'adapter' => $adapter
+          'adapter' => $adapter,
         )),
         'path' => $path,
         'options' => array(

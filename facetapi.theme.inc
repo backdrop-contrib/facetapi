@@ -29,7 +29,7 @@ function theme_facetapi_facet_missing($variables) {
  * @ingroup themeable
  */
 function theme_facetapi_title($variables) {
-  return t('Filter by @title:', array('@title' => drupal_strtolower($variables['title'])));
+  return t('Filter by @title:', array('@title' => backdrop_strtolower($variables['title'])));
 }
 
 /**

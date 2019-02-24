@@ -1,6 +1,6 @@
 (function ($) {
 
-Drupal.behaviors.facetapi = {
+Backdrop.behaviors.facetapi = {
   attach: function(context, settings) {
     // Iterates over facet settings, applies functionality like the "Show more"
     // links for block realm facets.
@@ -9,11 +9,11 @@ Drupal.behaviors.facetapi = {
     if (settings.facetapi) {
       for (var index in settings.facetapi.facets) {
         if (null != settings.facetapi.facets[index].makeCheckboxes) {
-          Drupal.facetapi.makeCheckboxes(settings.facetapi.facets[index].id);
+          Backdrop.facetapi.makeCheckboxes(settings.facetapi.facets[index].id);
         }
         if (null != settings.facetapi.facets[index].limit) {
           // Applies soft limit to the list.
-          Drupal.facetapi.applyLimit(settings.facetapi.facets[index]);
+          Backdrop.facetapi.applyLimit(settings.facetapi.facets[index]);
         }
       }
     }
@@ -23,12 +23,12 @@ Drupal.behaviors.facetapi = {
 /**
  * Class containing functionality for Facet API.
  */
-Drupal.facetapi = {}
+Backdrop.facetapi = {}
 
 /**
  * Applies the soft limit to facets in the block realm.
  */
-Drupal.facetapi.applyLimit = function(settings) {
+Backdrop.facetapi.applyLimit = function(settings) {
   if (settings.limit > 0 && !$('ul#' + settings.id).hasClass('facetapi-processed')) {
     // Only process this code once per page load.
     $('ul#' + settings.id).addClass('facetapi-processed');
@@ -48,7 +48,7 @@ Drupal.facetapi.applyLimit = function(settings) {
         }
         else {
           $(this).siblings().find('li:gt(' + limit + ')').slideDown();
-          $(this).addClass('open').text(Drupal.t(settings.showFewerText));
+          $(this).addClass('open').text(Backdrop.t(settings.showFewerText));
         }
         return false;
       }).insertAfter($(this));
@@ -59,14 +59,14 @@ Drupal.facetapi.applyLimit = function(settings) {
 /**
  * Constructor for the facetapi redirect class.
  */
-Drupal.facetapi.Redirect = function(href) {
+Backdrop.facetapi.Redirect = function(href) {
   this.href = href;
 }
 
 /**
  * Method to redirect to the stored href.
  */
-Drupal.facetapi.Redirect.prototype.gotoHref = function() {
+Backdrop.facetapi.Redirect.prototype.gotoHref = function() {
   window.location.href = this.href;
 }
 
@@ -74,14 +74,14 @@ Drupal.facetapi.Redirect.prototype.gotoHref = function() {
  * Turns all facet links into checkboxes.
  * Ensures the facet is disabled if a link is clicked.
  */
-Drupal.facetapi.makeCheckboxes = function(facet_id) {
+Backdrop.facetapi.makeCheckboxes = function(facet_id) {
   var $facet = $('#' + facet_id),
       $items = $('a.facetapi-checkbox, span.facetapi-checkbox', $facet);
 
   // Find all checkbox facet links and give them a checkbox.
-  $items.once('facetapi-makeCheckbox').each(Drupal.facetapi.makeCheckbox);
+  $items.once('facetapi-makeCheckbox').each(Backdrop.facetapi.makeCheckbox);
   $items.once('facetapi-disableClick').click(function (e) {
-    Drupal.facetapi.disableFacet($facet);
+    Backdrop.facetapi.disableFacet($facet);
   });
 }
 
@@ -89,12 +89,12 @@ Drupal.facetapi.makeCheckboxes = function(facet_id) {
  * Disable all facet links and checkboxes in the facet and apply a 'disabled'
  * class.
  */
-Drupal.facetapi.disableFacet = function ($facet) {
+Backdrop.facetapi.disableFacet = function ($facet) {
   var $elem = $(this);
   // Apply only for links.
   if ($elem[0].tagName == 'A') {
     $facet.addClass('facetapi-disabled');
-    $('a.facetapi-checkbox').click(Drupal.facetapi.preventDefault);
+    $('a.facetapi-checkbox').click(Backdrop.facetapi.preventDefault);
     $('input.facetapi-checkbox', $facet).attr('disabled', true);
   }
 }
@@ -102,14 +102,14 @@ Drupal.facetapi.disableFacet = function ($facet) {
 /**
  * Event listener for easy prevention of event propagation.
  */
-Drupal.facetapi.preventDefault = function (e) {
+Backdrop.facetapi.preventDefault = function (e) {
   e.preventDefault();
 }
 
 /**
  * Replace an unclick link with a checked checkbox.
  */
-Drupal.facetapi.makeCheckbox = function() {
+Backdrop.facetapi.makeCheckbox = function() {
   var $elem = $(this),
       active = $elem.hasClass('facetapi-active');
 
@@ -130,7 +130,7 @@ Drupal.facetapi.makeCheckbox = function() {
     var checkbox = $('<input type="checkbox" class="facetapi-checkbox" id="' + id + '" />'),
       // Get the href of the link that is this DOM object.
       href = $elem.attr('href'),
-      redirect = new Drupal.facetapi.Redirect(href);
+      redirect = new Backdrop.facetapi.Redirect(href);
   }
   // Link for elements with count more than 0.
   else {
@@ -138,7 +138,7 @@ Drupal.facetapi.makeCheckbox = function() {
   }
 
   checkbox.click(function (e) {
-    Drupal.facetapi.disableFacet($elem.parents('ul.facetapi-facetapi-checkbox-links'));
+    Backdrop.facetapi.disableFacet($elem.parents('ul.facetapi-facetapi-checkbox-links'));
     redirect.gotoHref();
   });
 

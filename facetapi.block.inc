@@ -23,7 +23,7 @@ function facetapi_block_info() {
  * @return array
  *   An array of block information.
  *
- * @see http://api.drupal.org/api/drupal/modules%21block%21block.api.php/function/hook_block_info/7
+ * @see http://api.drupal.org/api/backdrop/modules%21block%21block.api.php/function/hook_block_info/7
  */
 function facetapi_get_block_info(array $realm_names) {
   $blocks = array();
@@ -84,7 +84,7 @@ function facetapi_ctools_block_info($module, $delta, &$info) {
  *   The machine readable name of the realm.
  *
  * @return int
- *   The constants defined in includes/common.inc, defaults to DRUPAL_NO_CACHE.
+ *   The constants defined in includes/common.inc, defaults to BACKDROP_NO_CACHE.
  *
  * @see includes/common.inc
  */
@@ -93,15 +93,16 @@ function facetapi_get_block_cache_setting($searcher, $realm_name) {
   if ('block' != $realm_name) {
     $name .= ':' . $realm_name;
   }
-  return variable_get($name, DRUPAL_NO_CACHE);
+  // TODO This variable was probably removed in Backdrop without replacement.
+  return variable_get($name, BACKDROP_NO_CACHE);
 }
 
 /**
  * Implements hook_block_view().
  */
 function facetapi_block_view($delta = '') {
-  $builds = &drupal_static(__FUNCTION__, array());
-  $parsed = &drupal_static('facetapi_parsed_deltas', array());
+  $builds = &backdrop_static(__FUNCTION__, array());
+  $parsed = &backdrop_static('facetapi_parsed_deltas', array());
 
   // Test block visibility if not already tested.
   if (!isset($parsed[$delta]) && !facetapi_check_block_visibility($delta)) {
@@ -125,10 +126,13 @@ function facetapi_block_view($delta = '') {
     );
 
     // Returns the subject and content of the block.
-    $variables = array('title' => $builds[$group][$facet_name]['#title'], 'facet' => $builds[$group][$facet_name]);
+    $variables = array(
+      'title' => $builds[$group][$facet_name]['#title'],
+      'facet' => $builds[$group][$facet_name],
+    );
     return array(
       'subject' => theme('facetapi_title', $variables),
-      'content' => $builds[$group][$facet_name]
+      'content' => $builds[$group][$facet_name],
     );
   }
 }
@@ -151,7 +155,7 @@ function facetapi_check_block_visibility($delta) {
 
   // Store parsed deltas so we only calculate once. This also lets us know
   // whether hook_block_list_alter() was called or not.
-  $parsed = &drupal_static('facetapi_parsed_deltas', array());
+  $parsed = &backdrop_static('facetapi_parsed_deltas', array());
 
   // Ensures the delta is mapped.
   if (!isset($map[$delta])) {
@@ -193,7 +197,7 @@ function facetapi_check_block_visibility($delta) {
  *   An array containing the delta map.
  */
 function facetapi_get_delta_map() {
-  $map = &drupal_static(__FUNCTION__);
+  $map = &backdrop_static(__FUNCTION__);
   if (NULL === $map) {
     if ($data = cache_get('facetapi:delta_map')) {
       $map = $data->data;
@@ -276,9 +280,9 @@ function facetapi_parse_delta($raw_delta) {
 function facetapi_hash_delta($delta) {
   // Ensure hashes are URL safe and alpha-numeric.
   // @see http://drupal.org/node/1355270
-  $hash = substr(drupal_hash_base64($delta), 0, 32);
+  $hash = substr(backdrop_hash_base64($delta), 0, 32);
   $hash = strtr($hash, array('-' => '0', '_' => '1'));
-  drupal_alter('facetapi_hash', $hash, $delta);
+  backdrop_alter('facetapi_hash', $hash, $delta);
   return $hash;
 }
 

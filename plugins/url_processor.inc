@@ -85,7 +85,7 @@ abstract class FacetapiUrlProcessor {
    *
    * The return array must be able to be passed as the "query" key of the
    * options array passed as the second argument to the url() function. See
-   * http://api.drupal.org/api/drupal/includes%21common.inc/function/url/7 for
+   * http://api.drupal.org/api/backdrop/includes%21common.inc/function/url/7 for
    * more details.
    *
    * @param array $facet

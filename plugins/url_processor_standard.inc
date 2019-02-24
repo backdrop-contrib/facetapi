@@ -35,7 +35,7 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
    * Strips the "q" and "page" variables from the params array.
    */
   public function normalizeParams(array $params, $filter_key = 'f') {
-    return drupal_get_query_parameters($params, array('q', 'page'));
+    return backdrop_get_query_parameters($params, array('q', 'page'));
   }
 
   /**
@@ -92,7 +92,7 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
    * Implements FacetapiUrlProcessor::setBreadcrumb().
    */
   public function setBreadcrumb() {
-    $breadcrumb = drupal_get_breadcrumb();
+    $breadcrumb = backdrop_get_breadcrumb();
 
     // Gets search keys and active items form the adapter.
     $keys = $this->adapter->getSearchKeys();
@@ -129,7 +129,7 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
     }
 
     // Sets the breadcrumb trail with the keys and filters.
-    drupal_set_breadcrumb($breadcrumb);
+    backdrop_set_breadcrumb($breadcrumb);
   }
   /**
    * Allows for processor specific overrides to the settings form.
@@ -156,7 +156,7 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
    */
   public function getDefaultSettings() {
     return array(
-      'limit_active_items' => 0
+      'limit_active_items' => 0,
     );
   }
 }

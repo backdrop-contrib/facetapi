@@ -38,10 +38,10 @@ function facetapi_map_author(array $values) {
   $map = array();
   $users = user_load_multiple($values);
   foreach ($users as $user) {
-    $map[$user->uid] = format_username($user);
+    $map[$user->uid] = user_format_name($user);
   }
   if (isset($map[0])) {
-    $map[0] = variable_get('anonymous', t('Anonymous'));
+    $map[0] = config_get('system.performance', 'anonymous');
   }
   return $map;
 }

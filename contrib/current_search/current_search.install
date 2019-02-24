@@ -86,25 +86,5 @@ function current_search_uninstall() {
   }
 }
 
-/**
- * Update the structure of saved settings objects.
- */
-function current_search_update_7101() {
-  // @see http://drupal.org/node/1379166
-  $result = db_query('SELECT name, settings FROM {current_search}');
-  foreach ($result as $record) {
-    $settings = unserialize($record->settings);
-    // Make our best guess as to whether or not we are using the old structure.
-    if (count($settings) != 2 || !isset($settings['items']) || !isset($settings['advanced'])) {
-      $settings = array(
-        'items' => $settings,
-        'advanced' => array(
-          'empty_searches' => 0,
-        ),
-      );
-      db_update('current_search')
-        ->fields(array('settings' => serialize($settings)))
-        ->execute();
-    }
-  }
-}
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function current_search_update_7101() { }

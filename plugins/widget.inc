@@ -73,7 +73,7 @@ abstract class FacetapiWidget {
   protected $key;
 
   /**
-   * The widget's JavaScript settings that are passed to drupal_add_js().
+   * The widget's JavaScript settings that are passed to backdrop_add_js().
    *
    * For widgets that need make configurations available toe JavaScript files,
    * this is the best method for doing so. An example is the "soft limit" for
@@ -148,13 +148,13 @@ abstract class FacetapiWidget {
       $this->facet['field alias'] => $this->facet->getBuild(),
       '#attributes' => array(
         'class' => array(
-          drupal_html_class("facetapi-" . $this->id),
-          drupal_html_class("facetapi-facet-{$this->facet['name']}"),
+          backdrop_html_class("facetapi-" . $this->id),
+          backdrop_html_class("facetapi-facet-{$this->facet['name']}"),
         ),
-        'id' => drupal_html_id("facetapi-facet-$searcher-{$this->realm['name']}-{$this->facet['name']}"),
+        'id' => backdrop_html_id("facetapi-facet-$searcher-{$this->realm['name']}-{$this->facet['name']}"),
       ),
       '#attached' => array(
-        'js' => array(drupal_get_path('module', 'facetapi') . '/facetapi.js'),
+        'js' => array(backdrop_get_path('module', 'facetapi') . '/facetapi.js'),
       ),
     );
 
@@ -263,7 +263,7 @@ abstract class FacetapiWidget {
   }
 
   /**
-   * Returns the JavaScript settings that are passed to drupal_add_js().
+   * Returns the JavaScript settings that are passed to backdrop_add_js().
    *
    * @return array
    *   The JavaScript settings.
@@ -301,7 +301,7 @@ abstract class FacetapiWidget {
 
     if ($this->sorts) {
       // Orders the sorts, applies sorting algorithms in that order.
-      uasort($this->sorts, 'drupal_sort_weight');
+      uasort($this->sorts, 'backdrop_sort_weight');
       $this->applySorts($build[$this->facet['field alias']]);
     }
   }

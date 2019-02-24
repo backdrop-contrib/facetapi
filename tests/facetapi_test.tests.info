@@ -1,0 +1,30 @@
+[FacetapiTestCase]
+name = FacetapiTestCase
+description = FacetapiTestCase
+group = facetapi_test
+file = facetapi.test
+
+[FacetapiAdminInterfaceTestCase]
+name = Administrative UI
+description = Tests the UI for Facet API administrative pages.
+group = Facet API
+file = facetapi.test
+
+[FacetapiSearchPageInterfaceTestCase]
+name = Search page UI
+description = Tests the UI for search pages.
+group = Facet API
+file = facetapi.test
+
+[FacetapiBugFixTestCase]
+name = Bug Fixes
+description = Tests fixed bugs to prevent regressions.
+group = Facet API
+file = facetapi.test
+
+[FacetapiApiFunctions]
+name = API Functions
+description = Tests low level API functions.
+group = Facet API
+file = facetapi.test
+

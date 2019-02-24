@@ -67,11 +67,11 @@ function facetapi_requirement_property(array $definition, array $options, $opera
 
     // if the keys are numeric, map assoc them so intersect works
     if (is_int(key($requirement))) {
-      $requirement = drupal_map_assoc($requirement);
+      $requirement = backdrop_map_assoc($requirement);
     }
     // if the keys are numeric, map assoc them so intersect works
     if (is_int(key($condition))) {
-      $condition = drupal_map_assoc($condition);
+      $condition = backdrop_map_assoc($condition);
     }
 
     // Check if it is either an AND or OR operation and act accordingly

@@ -31,7 +31,7 @@ function theme_current_search_text(array $variables) {
   if ($variables['wrapper'] && $variables['element']) {
     $attributes = array('class' => $variables['class']);
     $element = check_plain($variables['element']);
-    $output = '<' . $element . drupal_attributes($attributes) . '>' . $output . '</' . $element . '>';
+    $output = '<' . $element . backdrop_attributes($attributes) . '>' . $output . '</' . $element . '>';
   }
 
   return $output;
@@ -64,11 +64,11 @@ function theme_current_search_item_wrapper(array $variables) {
   $attributes = array(
     'class' => array(
       'current-search-item',
-      drupal_html_class('current-search-item-' . $element['#current_search_id']),
-      drupal_html_class('current-search-item-' . $element['#current_search_name']),
+      backdrop_html_class('current-search-item-' . $element['#current_search_id']),
+      backdrop_html_class('current-search-item-' . $element['#current_search_name']),
     ),
   );
-  return '<div' . drupal_attributes($attributes) . '>' . $element['#children'] . '</div>';
+  return '<div' . backdrop_attributes($attributes) . '>' . $element['#children'] . '</div>';
 }
 
 /**
@@ -82,8 +82,11 @@ function theme_current_search_item_wrapper(array $variables) {
  */
 function theme_current_search_group_wrapper(array $variables) {
   $element = $variables['element'];
-  $attributes = array('class' => array('current-search-group current-search-group-' . drupal_html_class($element['#facet_name'])), 'id' => $element['#id']);
-  return '<div' . drupal_attributes($attributes) . '>' . $element['#children'] . '</div>';
+  $attributes = array(
+    'class' => array('current-search-group current-search-group-' . backdrop_html_class($element['#facet_name'])),
+    'id' => $element['#id'],
+  );
+  return '<div' . backdrop_attributes($attributes) . '>' . $element['#children'] . '</div>';
 }
 
 /**
@@ -165,10 +168,10 @@ function theme_current_search_sort_settings_table($variables) {
     $rows[$name] = array(
       'class' => array('draggable'),
       'data' => array(
-        drupal_render($variables['element'][$name]['item']),
-        drupal_render($variables['element'][$name]['weight']),
+        backdrop_render($variables['element'][$name]['item']),
+        backdrop_render($variables['element'][$name]['weight']),
         array(
-          'data' => drupal_render($variables['element'][$name]['remove']),
+          'data' => backdrop_render($variables['element'][$name]['remove']),
           'class' => 'current-search-remove-link',
         ),
       ),
@@ -177,8 +180,8 @@ function theme_current_search_sort_settings_table($variables) {
 
   // Builds table with draggable rows, returns output.
   $table_id = 'current-search-sort-settings';
-  drupal_add_tabledrag($table_id, 'order', 'sibling', 'current-search-sort-weight');
-  $output .= drupal_render_children($variables['element']);
+  backdrop_add_tabledrag($table_id, 'order', 'sibling', 'current-search-sort-weight');
+  $output .= backdrop_render_children($variables['element']);
   $output .= theme('table', array('rows' => $rows, 'attributes' => array('id' => $table_id)));
   return $output;
 }

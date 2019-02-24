@@ -124,7 +124,7 @@ class FacetapiWidgetLinks extends FacetapiWidget {
           $attributes['rel'] = 'nofollow';
         }
         // Add an ID to identify this link.
-        $variables['options']['attributes']['id'] = drupal_html_id('facetapi-link');
+        $variables['options']['attributes']['id'] = backdrop_html_id('facetapi-link');
         $variables['options'] += array(
           'html' => $item['#html'],
           'query' => $item['#query'],
@@ -189,7 +189,7 @@ class FacetapiWidgetLinks extends FacetapiWidget {
       '#type' => 'select',
       '#title' => t('Soft limit'),
       '#default_value' => $this->settings->settings['soft_limit'],
-      '#options' => array(0 => t('No limit')) + drupal_map_assoc(array(50, 40, 30, 20, 15, 10, 5, 3)),
+      '#options' => array(0 => t('No limit')) + backdrop_map_assoc(array(50, 40, 30, 20, 15, 10, 5, 3)),
       '#description' => t('Limits the number of displayed facets via JavaScript.'),
       '#states' => array(
         'visible' => array(
@@ -265,7 +265,7 @@ class FacetapiWidgetCheckboxLinks extends FacetapiWidgetLinks {
   public function init() {
     parent::init();
     $this->jsSettings['makeCheckboxes'] = 1;
-    drupal_add_css(drupal_get_path('module', 'facetapi') . '/facetapi.css');
+    backdrop_add_css(backdrop_get_path('module', 'facetapi') . '/facetapi.css');
   }
 
   /**

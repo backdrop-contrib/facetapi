@@ -23,8 +23,8 @@ class CurrentSearchGroup extends CurrentSearchItem {
     $adapter->processFacets();
 
     // Adds other current search module's CSS.
-    $path = drupal_get_path('module', 'current_search');
-    drupal_add_css($path . '/current_search.css');
+    $path = backdrop_get_path('module', 'current_search');
+    backdrop_add_css($path . '/current_search.css');
 
     // Adds active facets to the current search block.
     $searcher = $adapter->getSearcher();
@@ -66,7 +66,7 @@ class CurrentSearchGroup extends CurrentSearchItem {
       // If there are items, add the render array.
       if ($items) {
         $build[$facet_name]['#theme_wrappers'] = array('current_search_group_wrapper');
-        $build[$facet_name]['#id'] = drupal_html_id("current-search-group-$searcher-{$this->configName}-{$facet_name}");
+        $build[$facet_name]['#id'] = backdrop_html_id("current-search-group-$searcher-{$this->configName}-{$facet_name}");
         $build[$facet_name]['#facet_name'] = $facet_name;
 
         // Performs token replacemenets and themes the group title.

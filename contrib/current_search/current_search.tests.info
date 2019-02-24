@@ -1,0 +1,18 @@
+[CurrentSearchTestCase]
+name = CurrentSearchTestCase
+description = CurrentSearchTestCase
+group = current_search
+file = tests/current_search.test
+
+[CurrentSearchInterfaceTestCase]
+name = Administrative UI
+description = Tests the UI for Current Search Blocks administrative pages.
+group = Current Search Blocks
+file = tests/current_search.test
+
+[CurrentSearchBugFixTestCase]
+name = Bug Fixes
+description = Tests fixed bugs to prevent regressions.
+group = Current Search Blocks
+file = tests/current_search.test
+

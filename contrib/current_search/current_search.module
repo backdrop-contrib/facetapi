@@ -38,7 +38,7 @@ function current_search_menu() {
 
   $items['admin/config/search/current_search/item/%current_search_item/delete/%'] = array(
     'title' => 'Revert current search block configuration',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('current_search_delete_item_form', 5, 7),
     'access arguments' => array('administer search'),
     'type' => MENU_NORMAL_ITEM,
@@ -94,11 +94,11 @@ function current_search_theme() {
       'file' => 'current_search.theme.inc',
     ),
     'current_search_item_wrapper' => array(
-      'render element'  => 'element',
+      'render element' => 'element',
       'file' => 'current_search.theme.inc',
     ),
     'current_search_group_wrapper' => array(
-      'render element'  => 'element',
+      'render element' => 'element',
       'file' => 'current_search.theme.inc',
     ),
     'current_search_sort_settings_table' => array(
@@ -148,7 +148,7 @@ function current_search_ctools_plugin_type() {
  *   An associative array keyed by plugin ID to human readable label.
  */
 function current_search_get_plugins() {
-  $plugins = &drupal_static(__FUNCTION__, array());
+  $plugins = &backdrop_static(__FUNCTION__, array());
   if (!$plugins) {
     foreach (ctools_get_plugins('current_search', 'items') as $id => $plugin) {
       $plugins[$id] = $plugin['handler']['label'];
@@ -209,5 +209,18 @@ function current_search_current_search_items() {
         'class' => 'CurrentSearchGroup',
       ),
     ),
+  );
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function current_search_autoload_info() {
+  return array(
+    'CurrentSearchItem' => 'plugins/current_search/item.inc',
+    'CurrentSearchItemActive' => 'plugins/current_search/item_active.inc',
+    'CurrentSearchGroup' => 'plugins/current_search/item_group.inc',
+    'CurrentSearchItemText' => 'plugins/current_search/item_text.inc',
+    'current_search_export_ui' => 'plugins/export_ui/current_search_export_ui.class.php',
   );
 }

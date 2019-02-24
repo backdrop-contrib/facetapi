@@ -1,6 +1,6 @@
 (function ($) {
 
-Drupal.behaviors.facetapi = {
+Backdrop.behaviors.facetapi = {
   attach: function(context, settings) {
     // Ensures ALL soft limit select boxes are updated.
     // @see http://drupal.org/node/735528

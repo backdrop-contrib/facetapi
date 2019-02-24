@@ -70,28 +70,28 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
     $operations = array();
     $operations[] = array(
       'title' => t('Configure display'),
-      'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'edit')
+      'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'edit'),
     );
     if ($facet['dependency plugins']) {
       $operations[] = array(
         'title' => t('Configure dependencies'),
-        'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'dependencies')
+        'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'dependencies'),
       );
     }
     if (facetapi_filters_load($facet_name, $searcher, $realm['name'])) {
       $operations[] = array(
         'title' => t('Configure filters'),
-        'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'filters')
+        'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'filters'),
       );
     }
     $operations[] = array(
       'title' => t('Export configuration'),
-      'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'export')
+      'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'export'),
     );
     if (facetapi_is_overridden($settings) || facetapi_is_overridden($global_settings)) {
       $operations[] = array(
         'title' => t('Revert configuration'),
-        'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'revert')
+        'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'revert'),
       );
     }
 
@@ -99,7 +99,7 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
       '#theme' => 'links__ctools_dropbutton',
       '#links' => $operations,
       '#attributes' => array(
-        'class' => array('inline', 'links', 'actions', 'horizontal', 'right')
+        'class' => array('inline', 'links', 'actions', 'horizontal', 'right'),
       ),
     );
 
@@ -111,7 +111,7 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
         '#type' => 'select',
         '#title' => t('Weight for @title', array('@title' => $facet['label'])),
         '#title_display' => 'invisible',
-        '#options' => drupal_map_assoc(range(-50, 50)),
+        '#options' => backdrop_map_assoc(range(-50, 50)),
         '#default_value' => $settings->settings['weight'],
         '#attributes' => array('class' => array('facetapi-facet-weight')),
       );
@@ -122,7 +122,7 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
   }
 
   // Sorts by the weight appended above.
-  uasort($form['#facetapi']['facet_info'], 'drupal_sort_weight');
+  uasort($form['#facetapi']['facet_info'], 'backdrop_sort_weight');
 
   $form['table']['enabled_facets'] = array(
     '#type' => 'checkboxes',
@@ -131,12 +131,13 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
   );
 
   // Checks whether block caching is enabled, sets description accordingly.
+  // TODO This variable was probably removed in Backdrop without replacement.
   if (!$disabled = (module_implements('node_grants') || !variable_get('block_cache', FALSE))) {
     $description = t('Configure the appropriate cache setting for facet blocks.');
   }
   else {
     $description = t(
-      'To enable block caching, visit the <a href="@performance-page">performance page</a>.',
+      'To enable block caching, visit the <a href="@performance-page">performance page</a>.', 
       array('@performance-page' => url('admin/config/development/performance', array('query' => array('destination' => current_path()))))
     );
   }
@@ -146,11 +147,11 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
     '#title' => t('Block cache settings'),
     '#disabled' => $disabled,
     '#options' => array(
-      DRUPAL_NO_CACHE => t('Do not cache'),
-      DRUPAL_CACHE_PER_ROLE | DRUPAL_CACHE_PER_PAGE => t('Per role'),
-      DRUPAL_CACHE_PER_USER | DRUPAL_CACHE_PER_PAGE => t('Per user'),
+      BACKDROP_NO_CACHE => t('Do not cache'),
+      BACKDROP_CACHE_PER_ROLE | BACKDROP_CACHE_PER_PAGE => t('Per role'),
+      BACKDROP_CACHE_PER_USER | BACKDROP_CACHE_PER_PAGE => t('Per user'),
     ),
-    '#default_value' => variable_get('facetapi:block_cache:' . $searcher, DRUPAL_NO_CACHE),
+    '#default_value' => config_get('facetapi.settings', 'facetapi:block_cache:' . $searcher),
     '#description' => $description,
   );
 
@@ -187,19 +188,19 @@ function facetapi_realm_settings_form_submit($form, &$form_state) {
     if (!facetapi_save_facet_status($adapter, $realm, $facet, $status, $weight, TRUE)) {
       $success = FALSE;
       $message = t(
-        'Error saving configuration options for the %label facet.',
+        'Error saving configuration options for the %label facet.', 
         array('%label' => $facet['label'])
       );
-      drupal_set_message($message, 'error');
+      backdrop_set_message($message, 'error');
     }
   }
 
   // Sets message if all configurations were saved.
   if ($success) {
-    drupal_set_message(t('The configuration options have been saved.'));
+    backdrop_set_message(t('The configuration options have been saved.'));
     if ('block' == $form['#facetapi']['realm']['name']) {
-      drupal_set_message(t(
-        'To enable or arrange the facet blocks, visit the <a href="@block-page">blocks administration page</a>.',
+      backdrop_set_message(t(
+        'To enable or arrange the facet blocks, visit the <a href="@block-page">blocks administration page</a>.', 
         array('@block-page' => url('admin/structure/block', array('query' => array('destination' => current_path()))))
       ));
     }
@@ -208,7 +209,9 @@ function facetapi_realm_settings_form_submit($form, &$form_state) {
   // Saves block cache settings, clears block cache if setting was changed.
   if (isset($form_state['values']['block_cache'])) {
     $name = 'facetapi:block_cache:' . $adapter->getSearcher();
-    $original = variable_get($name, DRUPAL_NO_CACHE);
+    // TODO This variable was probably removed in Backdrop without replacement.
+    $original = variable_get($name, BACKDROP_NO_CACHE);
+    // TODO This variable was probably removed in Backdrop without replacement.
     variable_set($name, $form_state['values']['block_cache']);
     if ($original != $form_state['values']['block_cache']) {
       cache_clear_all(NULL, 'cache_block');
@@ -232,8 +235,8 @@ function theme_facetapi_realm_settings_table($variables) {
   $output = '';
 
   // Adds CSS to ensure that the dropbutton looks nice.
-  $path = drupal_get_path('module', 'facetapi');
-  drupal_add_css($path . '/facetapi.admin.css', array('weight' => CSS_THEME - 1));
+  $path = backdrop_get_path('module', 'facetapi');
+  backdrop_add_css($path . '/facetapi.admin.css', array('weight' => CSS_THEME - 1));
 
   // Gets variales for code readability.
   $searcher = $variables['element']['#facetapi']['adapter']->getSearcher();
@@ -257,23 +260,23 @@ function theme_facetapi_realm_settings_table($variables) {
     $rows[$facet_name] = array(
       'class' => $realm['sortable'] ? array('draggable') : array(),
       'data' => array(
-        drupal_render($variables['element']['enabled_facets'][$facet_name]),
+        backdrop_render($variables['element']['enabled_facets'][$facet_name]),
         check_plain($facet['label']) . "<div class='description'>" . filter_xss($facet['description']) . '</div>',
         array(
           'class' => 'facetapi-operations',
-          'data' => drupal_render($variables['element']['operations'][$facet_name]),
+          'data' => backdrop_render($variables['element']['operations'][$facet_name]),
         ),
       ),
     );
     if ($realm['sortable']) {
-      $rows[$facet_name]['data'][] = drupal_render($variables['element']['weight'][$facet_name]);
+      $rows[$facet_name]['data'][] = backdrop_render($variables['element']['weight'][$facet_name]);
     }
   }
 
   if ($realm['sortable']) {
-    drupal_add_tabledrag('facetapi-realm-settings', 'order', 'sibling', 'facetapi-facet-weight');
+    backdrop_add_tabledrag('facetapi-realm-settings', 'order', 'sibling', 'facetapi-facet-weight');
   }
-  $output .= drupal_render_children($variables['element']);
+  $output .= backdrop_render_children($variables['element']);
   $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'facetapi-realm-settings')));
 
   return $output;
@@ -328,7 +331,7 @@ function facetapi_get_widgets(array $realm, array $facet) {
   foreach (ctools_get_plugins('facetapi', 'widgets') as $id => $plugin) {
     $plugin['handler'] += array(
       'requirements' => array(
-        'facetapi_requirement_realm_property' => array('element type' => 'links')
+        'facetapi_requirement_realm_property' => array('element type' => 'links'),
       ),
       'requirements operator' => 'AND',
     );
@@ -378,14 +381,14 @@ function facetapi_get_available_sorts(array $realm, array $facet) {
  * @ingroup forms
  */
 function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapter, array $realm, array $facet) {
-  $path = drupal_get_path('module', 'facetapi');
-  drupal_add_css($path . '/facetapi.admin.css', array('weight' => CSS_THEME - 1));
-  drupal_add_js($path . '/facetapi.admin.js');
+  $path = backdrop_get_path('module', 'facetapi');
+  backdrop_add_css($path . '/facetapi.admin.css', array('weight' => CSS_THEME - 1));
+  backdrop_add_js($path . '/facetapi.admin.js');
   ctools_include('plugins');
 
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
-  drupal_set_title(t('Configure facet display for @label', array('@label' => $facet['label'])));
+  backdrop_set_title(t('Configure facet display for @label', array('@label' => $facet['label'])));
 
   // Captures variables and settings for code readability.
   $searcher = $adapter->getSearcher();
@@ -398,8 +401,14 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
     'facet' => $facet,
     'sort_info' => array(),
     'excluded_values' => array(
-      'form_build_id', 'form_token', 'form_id', 'op', 'submit', 'submit_list',
-      'submit_realm', 'settings__active_tab',
+      'form_build_id',
+      'form_token',
+      'form_id',
+      'op',
+      'submit',
+      'submit_list',
+      'submit_realm',
+      'settings__active_tab',
     ),
   );
 
@@ -433,9 +442,9 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
     '#type' => 'textfield',
     '#title' => t('Facet Title'),
     '#description' => t('To remove or alter the default title prefix: "Filter by @title:", implement the following hook in your theme: !url.', array(
-      '!url' => l('THEME_facetapi_title()', 'http://drupalcontrib.org/api/drupal/contributions!facetapi!facetapi.theme.inc/function/theme_facetapi_title/7', array(
+      '!url' => l('THEME_facetapi_title()', 'http://backdropcontrib.org/api/backdrop/contributions!facetapi!facetapi.theme.inc/function/theme_facetapi_title/7', array(
         'attributes' => array('target' => '_blank'),
-      ))
+      )),
     )),
     '#default_value' => $facet_settings->settings['title'],
     '#states' => array(
@@ -486,7 +495,7 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
   }
 
   // Orders the sorts by the default weights set above.
-  uasort($form['#facetapi']['sort_info'], 'drupal_sort_weight');
+  uasort($form['#facetapi']['sort_info'], 'backdrop_sort_weight');
 
   // Builds checkbox options and weight dropboxes.
   $sort_options = array();
@@ -584,7 +593,7 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
   );
 
   // Loop through the query types so the key is the same as the value
-  $query_types = drupal_map_assoc($facet['query types'], 'check_plain');
+  $query_types = backdrop_map_assoc($facet['query types'], 'check_plain');
   $form['global']['query_type'] = array(
     '#type' => 'select',
     '#access' => count($facet['query types']) > 1,
@@ -609,10 +618,10 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
     '#suffix' => '</div>',
     '#default_value' => $global_settings->settings['operator'],
     '#options' => $options,
-    '#description' => t('AND filters are exclusive and narrow the result set. OR filters are inclusive and widen the result set.')
+    '#description' => t('AND filters are exclusive and narrow the result set. OR filters are inclusive and widen the result set.'),
   );
 
-  $hard_limit_options = drupal_map_assoc(array(3, 5, 10, 15, 20, 30, 40, 50, 75, 100));
+  $hard_limit_options = backdrop_map_assoc(array(3, 5, 10, 15, 20, 30, 40, 50, 75, 100));
   $hard_limit_options[-1] = t('No limit');
 
   $form['global']['hard_limit'] = array(
@@ -622,7 +631,7 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
     '#suffix' => '</div>',
     '#default_value' => $global_settings->settings['hard_limit'],
     '#options' => $hard_limit_options,
-    '#description' => t('Display no more than this number of facet items.')
+    '#description' => t('Display no more than this number of facet items.'),
   );
 
   $form['global']['flatten'] = array(
@@ -632,7 +641,10 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
     '#prefix' => '<div class="facetapi-global-setting">',
     '#suffix' => '</div>',
     '#default_value' => $global_settings->settings['flatten'],
-    '#options' => array(0 => t('No'), 1 => t('Yes')),
+    '#options' => array(
+      0 => t('No'),
+      1 => t('Yes'),
+    ),
     '#description' => t('Do not process hierarchical relationships and display facet items as a flat list.'),
   );
 
@@ -643,7 +655,10 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
     '#prefix' => '<div class="facetapi-global-setting">',
     '#suffix' => '</div>',
     '#default_value' => $global_settings->settings['individual_parent'],
-    '#options' => array(0 => t('No'), 1 => t('Yes')),
+    '#options' => array(
+      0 => t('No'),
+      1 => t('Yes'),
+    ),
     '#description' => t('Parent items will not be active when selecting a children and if active, they will not clear their children facet selection.'),
     '#states' => array(
       'visible' => array(
@@ -671,7 +686,10 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
     '#prefix' => '<div class="facetapi-global-setting">',
     '#suffix' => '</div>',
     '#default_value' => $global_settings->settings['facet_missing'],
-    '#options' => array(0 => t('No'), 1 => t('Yes')),
+    '#options' => array(
+      0 => t('No'),
+      1 => t('Yes'),
+    ),
     '#description' => t('Adds an extra facet matching documents with no value at all for this field.'),
   );
 
@@ -691,7 +709,7 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
   if (isset($_GET['destination']) && !url_is_external($_GET['destination'])) {
     $submit_text = t('Save and go back to search page');
     $cancel_title = t('Return to the search page without saving configuration changes.');
-    $url = drupal_parse_url($_GET['destination']);
+    $url = backdrop_parse_url($_GET['destination']);
   }
   else {
     $submit_text = t('Save configuration');
@@ -775,16 +793,16 @@ function theme_facetapi_sort_settings_table($variables) {
     $rows[$sort_name] = array(
       'class' => array('draggable'),
       'data' => array(
-        drupal_render($variables['element']['active_sorts'][$sort_name]),
+        backdrop_render($variables['element']['active_sorts'][$sort_name]),
         check_plain($sort['label']) . "<div class='description'>" . filter_xss($sort['description']) . '</div>',
-        drupal_render($variables['element']['sort_order'][$sort_name]),
-        drupal_render($variables['element']['sort_weight'][$sort_name]),
+        backdrop_render($variables['element']['sort_order'][$sort_name]),
+        backdrop_render($variables['element']['sort_weight'][$sort_name]),
       ),
     );
   }
 
-  drupal_add_tabledrag('facetapi-sort-settings', 'order', 'sibling', 'facetapi-sort-weight');
-  $output .= drupal_render_children($variables['element']);
+  backdrop_add_tabledrag('facetapi-sort-settings', 'order', 'sibling', 'facetapi-sort-weight');
+  $output .= backdrop_render_children($variables['element']);
   $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'facetapi-sort-settings')));
 
   return $output;
@@ -801,7 +819,7 @@ function facetapi_facet_display_form_validate($form, &$form_state) {
 
   // Loads the widget plugin, makes sure it supports the selected type.
   if ($widget = ctools_get_plugins('facetapi', 'widgets', $widget_name)) {
-    $widget_types = drupal_map_assoc($widget['handler']['query types']);
+    $widget_types = backdrop_map_assoc($widget['handler']['query types']);
     if (!isset($widget_types[$query_type])) {
       $error = t('The widget does not support the %type query type', array('%type' => $query_type));
       form_set_error('widget', $error);
@@ -828,7 +846,7 @@ function facetapi_facet_display_form_submit($form, &$form_state) {
   // Loads settings, saves all form values as settings other than excluded.
   $facet_settings = $adapter->getFacet($facet)->getSettings($realm);
   $facet_settings->settings = array_merge($facet_settings->settings, array_diff_key(
-    $form_state['values'],
+    $form_state['values'], 
     array_flip($form['#facetapi']['excluded_values'])
   ));
 
@@ -839,17 +857,17 @@ function facetapi_facet_display_form_submit($form, &$form_state) {
 
   $success = TRUE;
   if (FALSE === ctools_export_crud_save('facetapi', $facet_settings)) {
-    drupal_set_message(t('Error saving configuration options.'), 'error');
+    backdrop_set_message(t('Error saving configuration options.'), 'error');
     $success = FALSE;
   }
   if (FALSE === ctools_export_crud_save('facetapi', $global_settings)) {
-    drupal_set_message(t('Error saving configuration options.'), 'error');
+    backdrop_set_message(t('Error saving configuration options.'), 'error');
     $success = FALSE;
   }
 
   // Sets message if both sets of configurations were saved.
   if ($success) {
-    drupal_set_message(t('The configuration options have been saved.'));
+    backdrop_set_message(t('The configuration options have been saved.'));
   }
 
   // Redirects back to the realm settings page if necessary.
@@ -880,7 +898,7 @@ function facetapi_facet_filters_form($form, &$form_state, FacetapiAdapter $adapt
 
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
-  drupal_set_title(t('Configure facet filters for @label', array('@label' => $facet['label'])));
+  backdrop_set_title(t('Configure facet filters for @label', array('@label' => $facet['label'])));
 
   // Adds Facet API settings, excluded values aren't saved.
   $form['#facetapi'] = array(
@@ -932,7 +950,7 @@ function facetapi_facet_filters_form($form, &$form_state, FacetapiAdapter $adapt
       );
     }
   }
-  uasort($plugins, 'drupal_sort_weight');
+  uasort($plugins, 'backdrop_sort_weight');
 
   // Builds table, adds settings to vertical tabs.
   $has_settings = FALSE;
@@ -1002,7 +1020,7 @@ function facetapi_facet_filters_form($form, &$form_state, FacetapiAdapter $adapt
   if (isset($_GET['destination']) && !url_is_external($_GET['destination'])) {
     $submit_text = t('Save and go back to search page');
     $cancel_title = t('Return to the search page without saving configuration changes.');
-    $url = drupal_parse_url($_GET['destination']);
+    $url = backdrop_parse_url($_GET['destination']);
   }
   else {
     $submit_text = t('Save configuration');
@@ -1054,16 +1072,16 @@ function theme_facetapi_filter_settings_table($variables) {
     $element[$name]['weight']['#attributes']['class'][] = 'facetapi-filter-weight';
     $rows[] = array(
       'data' => array(
-        drupal_render($element[$name]['status']),
-        drupal_render($element[$name]['filter']),
-        drupal_render($element[$name]['weight']),
+        backdrop_render($element[$name]['status']),
+        backdrop_render($element[$name]['filter']),
+        backdrop_render($element[$name]['weight']),
       ),
       'class' => array('draggable'),
     );
   }
-  $output = drupal_render_children($element);
+  $output = backdrop_render_children($element);
   $output .= theme('table', array('rows' => $rows, 'attributes' => array('id' => 'facetapi-filter-settings')));
-  drupal_add_tabledrag('facetapi-filter-settings', 'order', 'sibling', 'facetapi-filter-weight', NULL, NULL, TRUE);
+  backdrop_add_tabledrag('facetapi-filter-settings', 'order', 'sibling', 'facetapi-filter-weight', NULL, NULL, TRUE);
 
   return $output;
 }
@@ -1090,10 +1108,10 @@ function facetapi_facet_filters_form_submit($form, &$form_state) {
 
   // Saves the configuration options.
   if (FALSE !== ctools_export_crud_save('facetapi', $settings)) {
-    drupal_set_message(t('The configuration options have been saved.'));
+    backdrop_set_message(t('The configuration options have been saved.'));
   }
   else {
-    drupal_set_message(t('Error saving configuration options.'), 'error');
+    backdrop_set_message(t('Error saving configuration options.'), 'error');
   }
 
   // Redirects back to the realm settings page if necessary.
@@ -1125,7 +1143,7 @@ function facetapi_facet_dependencies_form($form, &$form_state, FacetapiAdapter $
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
   $facet = facetapi_facet_load(arg(6), $adapter->getSearcher());
-  drupal_set_title(t('Configure facet dependencies for @label', array('@label' => $facet['label'])));
+  backdrop_set_title(t('Configure facet dependencies for @label', array('@label' => $facet['label'])));
 
   // Adds Facet API settings, excluded values aren't saved.
   $form['#facetapi'] = array(
@@ -1137,7 +1155,7 @@ function facetapi_facet_dependencies_form($form, &$form_state, FacetapiAdapter $
 
   $form['description'] = array(
     '#prefix' => '<div class="facetapi-realm-description">',
-    '#markup' => t('Dependencies are conditions that must be met in order for the facet to be processed by the server and displayed to the user. Hiding facets via the core block system or through the Drupal forms API will not prevent the server from processing the facets.'),
+    '#markup' => t('Dependencies are conditions that must be met in order for the facet to be processed by the server and displayed to the user. Hiding facets via the core block system or through the Backdrop forms API will not prevent the server from processing the facets.'),
     '#suffix' => "</div>\n",
   );
 
@@ -1183,7 +1201,7 @@ function facetapi_facet_dependencies_form($form, &$form_state, FacetapiAdapter $
   if (isset($_GET['destination']) && !url_is_external($_GET['destination'])) {
     $submit_text = t('Save and go back to search page');
     $cancel_title = t('Return to the search page without saving configuration changes.');
-    $url = drupal_parse_url($_GET['destination']);
+    $url = backdrop_parse_url($_GET['destination']);
   }
   else {
     $submit_text = t('Save configuration');
@@ -1235,13 +1253,13 @@ function facetapi_facet_dependencies_form_submit($form, &$form_state) {
 
   // Writes the settings to the database.
   if (FALSE === ctools_export_crud_save('facetapi', $settings)) {
-    drupal_set_message(t('Error saving configuration options.'), 'error');
+    backdrop_set_message(t('Error saving configuration options.'), 'error');
     $success = FALSE;
   }
 
   // Sets message if both sets of configurations were saved.
   if ($success) {
-    drupal_set_message(t('The configuration options have been saved.'));
+    backdrop_set_message(t('The configuration options have been saved.'));
   }
 
   // Redirects back to the realm settings page if necessary.
@@ -1313,7 +1331,7 @@ function facetapi_revert_form($form, &$form_state, FacetapiAdapter $adapter, arr
   );
 
   $form['text'] = array(
-   '#markup' => '<p>' . t('Any changes you have made will be lost and cannot be recovered.') . '</p>',
+    '#markup' => '<p>' . t('Any changes you have made will be lost and cannot be recovered.') . '</p>',
   );
 
   $form['revert_facet'] = array(
@@ -1375,6 +1393,6 @@ function facetapi_revert_form_submit($form, &$form_state) {
   }
 
   // Sets message if both sets of configurations were saved.
-  drupal_set_message(t('The configuration options have been reverted.'));
+  backdrop_set_message(t('The configuration options have been reverted.'));
   $form_state['redirect'] = $adapter->getPath($realm['name']);
 }
