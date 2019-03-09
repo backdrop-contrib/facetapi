@@ -210,10 +210,10 @@ abstract class FacetapiAdapter {
 
     // Get the url processor plugin class. If the class for the passed plugin
     // cannot be retrieved, log the error and load the standard plugin.
-    if (!$class = ctools_plugin_load_class('facetapi', 'url_processors', $id, 'handler')) {
+    if (!$class = facetapi_plugin_load_class('facetapi', 'url_processors', $id, 'handler')) {
       if ('standard' != $id) {
         watchdog('facetapi', 'Url processor plugin "@id" not valid, loading standard plugin.', array('@id' => $id), WATCHDOG_ERROR);
-        $class = ctools_plugin_load_class('facetapi', 'url_processors', 'standard', 'handler');
+        $class = facetapi_plugin_load_class('facetapi', 'url_processors', 'standard', 'handler');
       }
       else {
         // The plugins are not registered, probably because CTools is weighted
@@ -356,7 +356,7 @@ abstract class FacetapiAdapter {
 
     // Gather a whitelist of query type plugins supported by this searcher.
     $plugin_ids = array();
-    foreach (ctools_get_plugins('facetapi', 'query_types') as $plugin) {
+    foreach (facetapi_get_plugins('facetapi', 'query_types') as $plugin) {
       if ($this->info['adapter'] == $plugin['handler']['adapter']) {
         $type = call_user_func(array($plugin['handler']['class'], 'getType'));
         $plugin_ids[$type] = $plugin['handler']['class'];
@@ -666,7 +666,7 @@ abstract class FacetapiAdapter {
       // Instantiate and execute dependency plugins.
       $display = TRUE;
       foreach ($facet['dependency plugins'] as $id) {
-        $class = ctools_plugin_load_class('facetapi', 'dependencies', $id, 'handler');
+        $class = facetapi_plugin_load_class('facetapi', 'dependencies', $id, 'handler');
         $plugin = new $class($id, $this, $facet, $settings, $this->activeItems['facet']);
         if (NULL !== ($return = $plugin->execute())) {
           $display = $return;
@@ -801,11 +801,11 @@ abstract class FacetapiAdapter {
 
       // Apply the widget plugin's default settings.
       $id = $this->settings[$name]->settings['widget'];
-      $class = ctools_plugin_load_class('facetapi', 'widgets', $id, 'handler');
+      $class = facetapi_plugin_load_class('facetapi', 'widgets', $id, 'handler');
       // If we have an invalid widget, fall back to the realm's default widget.
       if (!$class) {
         $id = $this->settings[$name]->settings['widget'] = $realm['default widget'];
-        $class = ctools_plugin_load_class('facetapi', 'widgets', $id, 'handler');
+        $class = facetapi_plugin_load_class('facetapi', 'widgets', $id, 'handler');
       }
       $plugin = new $class($id, $realm, $this->getFacet($facet), $this->settings[$name]);
       $this->settings[$name]->settings += $plugin->getDefaultSettings();
@@ -872,7 +872,7 @@ abstract class FacetapiAdapter {
         if ($is_new) {
           $this->settings[$name]->settings['dependencies'] = array();
         }
-        $class = ctools_plugin_load_class('facetapi', 'dependencies', $id, 'handler');
+        $class = facetapi_plugin_load_class('facetapi', 'dependencies', $id, 'handler');
         $plugin = new $class($id, $this, $facet, $this->settings[$name], array());
         $this->settings[$name]->settings['dependencies'] += $plugin->getDefaultSettings();
       }
@@ -1281,7 +1281,7 @@ class FacetapiFacet implements ArrayAccess {
     $enabled_filters = array_filter($settings->settings['filters'], 'facetapi_filter_disabled_filters');
     uasort($enabled_filters, 'backdrop_sort_weight');
     foreach ($enabled_filters as $filter_id => $filter_settings) {
-      if ($class = ctools_plugin_load_class('facetapi', 'filters', $filter_id, 'handler')) {
+      if ($class = facetapi_plugin_load_class('facetapi', 'filters', $filter_id, 'handler')) {
         $filter_plugin = new $class($filter_id, $this->adapter, $settings);
         $this->build = $filter_plugin->execute($this->build);
       }
@@ -1293,7 +1293,7 @@ class FacetapiFacet implements ArrayAccess {
     // Instantiate and initialize the widget plugin.
     // @todo Add defensive coding here for widgets?
     $widget_name = $settings->settings['widget'];
-    if ($class = ctools_plugin_load_class('facetapi', 'widgets', $widget_name, 'handler')) {
+    if ($class = facetapi_plugin_load_class('facetapi', 'widgets', $widget_name, 'handler')) {
       $widget_plugin = new $class($widget_name, $realm, $this, $settings);
       $widget_plugin->init();
     }
@@ -1310,12 +1310,12 @@ class FacetapiFacet implements ArrayAccess {
     else {
       // Instantiate the empty behavior plugin.
       $id = $settings->settings['empty_behavior'];
-      if ($class = ctools_plugin_load_class('facetapi', 'empty_behaviors', $id, 'handler')) {
+      if ($class = facetapi_plugin_load_class('facetapi', 'empty_behaviors', $id, 'handler')) {
         $empty_plugin = new $class($settings);
       }
       // Fallback for the case when empty_behavior plugin is not available.
       else {
-        $class = ctools_plugin_load_class('facetapi', 'empty_behaviors', 'none', 'handler');
+        $class = facetapi_plugin_load_class('facetapi', 'empty_behaviors', 'none', 'handler');
         $empty_plugin = new $class($settings);
       }
       // Execute the empty behavior plugin.

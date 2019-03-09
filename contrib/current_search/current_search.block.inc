@@ -60,7 +60,7 @@ function current_search_block_info() {
   $blocks = array();
 
   // Loads settings for enabled facets.
-  ctools_include('export');
+  // cttools_include('export');
   foreach (ctools_export_crud_load_all('current_search') as $config) {
     if (empty($config->disabled)) {
       $blocks[$config->name] = array(
@@ -103,7 +103,7 @@ function current_search_block_view($delta = '') {
 
     // Iterates over configs and executes the plugins.
     foreach ($config->settings['items'] as $name => $settings) {
-      if ($class = ctools_plugin_load_class('current_search', 'items', $settings['id'], 'handler')) {
+      if ($class = facetapi_plugin_load_class('current_search', 'items', $settings['id'], 'handler')) {
         $plugin = new $class($name, $config);
         if ($return = $plugin->execute($adapter)) {
           $build[$name] = $return;

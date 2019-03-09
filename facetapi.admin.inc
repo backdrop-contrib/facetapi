@@ -328,7 +328,7 @@ function facetapi_get_widgets(array $realm, array $facet) {
   $plugins = array();
 
   // Iterates over all defined plugins, initializes requirements.
-  foreach (ctools_get_plugins('facetapi', 'widgets') as $id => $plugin) {
+  foreach (facetapi_get_plugins('facetapi', 'widgets') as $id => $plugin) {
     $plugin['handler'] += array(
       'requirements' => array(
         'facetapi_requirement_realm_property' => array('element type' => 'links'),
@@ -384,7 +384,7 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
   $path = backdrop_get_path('module', 'facetapi');
   backdrop_add_css($path . '/facetapi.admin.css', array('weight' => CSS_THEME - 1));
   backdrop_add_js($path . '/facetapi.admin.js');
-  ctools_include('plugins');
+  // // cttools_include('plugins');
 
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
@@ -538,7 +538,7 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
   );
 
   $empty_options = array();
-  foreach (ctools_get_plugins('facetapi', 'empty_behaviors') as $id => $plugin) {
+  foreach (facetapi_get_plugins('facetapi', 'empty_behaviors') as $id => $plugin) {
     $empty_options[$id] = $plugin['handler']['label'];
     $class = $plugin['handler']['class'];
     $plugin = new $class($facet_settings);
@@ -812,13 +812,13 @@ function theme_facetapi_sort_settings_table($variables) {
  * Form validation handler for facetapi_facet_display_form().
  */
 function facetapi_facet_display_form_validate($form, &$form_state) {
-  ctools_include('plugins');
+  // // cttools_include('plugins');
   // Gets the selected query type and widget.
   $query_type = $form_state['values']['global']['query_type'];
   $widget_name = $form_state['values']['widget'];
 
   // Loads the widget plugin, makes sure it supports the selected type.
-  if ($widget = ctools_get_plugins('facetapi', 'widgets', $widget_name)) {
+  if ($widget = facetapi_get_plugins('facetapi', 'widgets', $widget_name)) {
     $widget_types = backdrop_map_assoc($widget['handler']['query types']);
     if (!isset($widget_types[$query_type])) {
       $error = t('The widget does not support the %type query type', array('%type' => $query_type));
@@ -856,11 +856,11 @@ function facetapi_facet_display_form_submit($form, &$form_state) {
   }
 
   $success = TRUE;
-  if (FALSE === ctools_export_crud_save('facetapi', $facet_settings)) {
+  if (FALSE === facetapi_export_crud_save('facetapi', $facet_settings)) {
     backdrop_set_message(t('Error saving configuration options.'), 'error');
     $success = FALSE;
   }
-  if (FALSE === ctools_export_crud_save('facetapi', $global_settings)) {
+  if (FALSE === facetapi_export_crud_save('facetapi', $global_settings)) {
     backdrop_set_message(t('Error saving configuration options.'), 'error');
     $success = FALSE;
   }
@@ -932,7 +932,7 @@ function facetapi_facet_filters_form($form, &$form_state, FacetapiAdapter $adapt
   $weight = -50;
   $plugins = array();
   foreach ($filters['plugins'] as $id => $plugin) {
-    if ($class = ctools_plugin_load_class('facetapi', 'filters', $id, 'handler')) {
+    if ($class = facetapi_plugin_load_class('facetapi', 'filters', $id, 'handler')) {
       // Gets filter defaults.
       $filter_plugin = new $class($id, $adapter, $settings);
       $default = $filter_plugin->getDefaultSettings() + array(
@@ -990,7 +990,7 @@ function facetapi_facet_filters_form($form, &$form_state, FacetapiAdapter $adapt
     );
 
     // Allows plugin to add settings to the form.
-    if ($class = ctools_plugin_load_class('facetapi', 'filters', $id, 'handler')) {
+    if ($class = facetapi_plugin_load_class('facetapi', 'filters', $id, 'handler')) {
       $filter = new $class($id, $adapter, $settings);
       $filter->settingsForm($form['settings']['filters']['filter_settings'][$id], $form_state);
     }
@@ -1107,7 +1107,7 @@ function facetapi_facet_filters_form_submit($form, &$form_state) {
   $settings->settings = array_merge($settings->settings, $form_state_values_settings);
 
   // Saves the configuration options.
-  if (FALSE !== ctools_export_crud_save('facetapi', $settings)) {
+  if (FALSE !== facetapi_export_crud_save('facetapi', $settings)) {
     backdrop_set_message(t('The configuration options have been saved.'));
   }
   else {
@@ -1165,7 +1165,7 @@ function facetapi_facet_dependencies_form($form, &$form_state, FacetapiAdapter $
   );
 
   // Iterates over plugins, adds settings as vertical tabs.
-  $plugins = ctools_get_plugins('facetapi', 'dependencies');
+  $plugins = facetapi_get_plugins('facetapi', 'dependencies');
   foreach ($dependencies as $plugin) {
     // Only gets settings once.
     if (!$form['#facetapi']['settings']) {
@@ -1252,7 +1252,7 @@ function facetapi_facet_dependencies_form_submit($form, &$form_state) {
   $settings->settings['dependencies'] = $values + $defaults;
 
   // Writes the settings to the database.
-  if (FALSE === ctools_export_crud_save('facetapi', $settings)) {
+  if (FALSE === facetapi_export_crud_save('facetapi', $settings)) {
     backdrop_set_message(t('Error saving configuration options.'), 'error');
     $success = FALSE;
   }
@@ -1279,7 +1279,7 @@ function facetapi_facet_dependencies_form_submit($form, &$form_state) {
  * @param array $facet
  *   The facet definition.
  *
- * @see ctools_export_form()
+ * @see facetapi_export_form()
  * @ingroup forms
  */
 function facetapi_export_form($form, &$form_state, FacetapiAdapter $adapter, array $realm, array $facet) {
@@ -1296,14 +1296,14 @@ function facetapi_export_form($form, &$form_state, FacetapiAdapter $adapter, arr
   // Gets export fieldset for display settings.
   $title = t('Display settings');
   $settings = $adapter->getFacetSettings($facet, $realm);
-  $export = ctools_export_crud_export('facetapi', $settings);
-  $form['facet'] = ctools_export_form($form['facet'], $form_state, $export, $title);
+  $export = facetapi_export_crud_export('facetapi', $settings);
+  $form['facet'] = facetapi_ctools_export_form($form['facet'], $form_state, $export, $title);
 
   // Gets export fieldset for display settings.
   $title = t('Global settings');
   $settings = $adapter->getFacetSettingsGlobal($facet);
-  $export = ctools_export_crud_export('facetapi', $settings);
-  $form['global'] = ctools_export_form($form['global'], $form_state, $export, $title);
+  $export = facetapi_export_crud_export('facetapi', $settings);
+  $form['global'] = facetapi_ctools_export_form($form['global'], $form_state, $export, $title);
 
   // Adds settings and returns form.
   $form['#settings'] = $settings;

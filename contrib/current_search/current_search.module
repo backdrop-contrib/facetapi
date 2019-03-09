@@ -150,7 +150,7 @@ function current_search_ctools_plugin_type() {
 function current_search_get_plugins() {
   $plugins = &backdrop_static(__FUNCTION__, array());
   if (!$plugins) {
-    foreach (ctools_get_plugins('current_search', 'items') as $id => $plugin) {
+    foreach (facetapi_get_plugins('current_search', 'items') as $id => $plugin) {
       $plugins[$id] = $plugin['handler']['label'];
     }
   }
@@ -181,7 +181,7 @@ function current_search_get_searcher_options() {
  *   An object containing the configuration, FALSE if not defined.
  */
 function current_search_item_load($name) {
-  ctools_include('export');
+  // cttools_include('export');
   $result = ctools_export_crud_load('current_search', $name);
   return $result ? $result : FALSE;
 }

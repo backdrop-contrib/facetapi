@@ -386,7 +386,7 @@ function current_search_settings_form(&$form, &$form_state) {
   // Builds table, adds settings to vertical tabs.
   $has_settings = FALSE;
   foreach ($item->settings['items'] as $name => $settings) {
-    if ($class = ctools_plugin_load_class('current_search', 'items', $settings['id'], 'handler')) {
+    if ($class = facetapi_plugin_load_class('current_search', 'items', $settings['id'], 'handler')) {
       $plugin = new $class($name, $item);
 
       // Initializes vertical tab for the item's settings.
@@ -489,7 +489,7 @@ function current_search_add_item_submit($form, &$form_state) {
   $label = $form_state['values']['plugins']['item_label'];
 
   // Adds settings to the array.
-  if ($class = ctools_plugin_load_class('current_search', 'items', $id, 'handler')) {
+  if ($class = facetapi_plugin_load_class('current_search', 'items', $id, 'handler')) {
     $plugin = new $class($name);
     $item->settings['items'][$name] = $plugin->getDefaultSettings() + array(
       'id' => $id,
@@ -580,7 +580,7 @@ function current_search_delete_item_form_submit($form, &$form_state) {
     $label = $item->settings['items'][$name]['label'];
     drupal_set_message(t('@label has been removed.', array('@label' => $label)));
     unset($item->settings['items'][$name]);
-    ctools_export_crud_save('current_search', $item);
+    facetapi_export_crud_save('current_search', $item);
   }
 
   // Resirects back to current search block configuration page.

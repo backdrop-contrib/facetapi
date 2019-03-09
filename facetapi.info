@@ -1,6 +1,6 @@
 name = Facet API
 description = An abstracted facet API that can be used by various search backends.
-dependencies[] = ctools
+
 package = Search Toolkit
 backdrop = 1.x
 type = module
