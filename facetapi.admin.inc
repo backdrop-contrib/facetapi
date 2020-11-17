@@ -122,7 +122,7 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
   }
 
   // Sorts by the weight appended above.
-  uasort($form['#facetapi']['facet_info'], 'backdrop_sort_weight');
+  uasort($form['#facetapi']['facet_info'], 'facetapi_sort_weight');
 
   $form['table']['enabled_facets'] = array(
     '#type' => 'checkboxes',
@@ -137,7 +137,7 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
   }
   else {
     $description = t(
-      'To enable block caching, visit the <a href="@performance-page">performance page</a>.', 
+      'To enable block caching, visit the <a href="@performance-page">performance page</a>.',
       array('@performance-page' => url('admin/config/development/performance', array('query' => array('destination' => current_path()))))
     );
   }
@@ -188,7 +188,7 @@ function facetapi_realm_settings_form_submit($form, &$form_state) {
     if (!facetapi_save_facet_status($adapter, $realm, $facet, $status, $weight, TRUE)) {
       $success = FALSE;
       $message = t(
-        'Error saving configuration options for the %label facet.', 
+        'Error saving configuration options for the %label facet.',
         array('%label' => $facet['label'])
       );
       backdrop_set_message($message, 'error');
@@ -200,7 +200,7 @@ function facetapi_realm_settings_form_submit($form, &$form_state) {
     backdrop_set_message(t('The configuration options have been saved.'));
     if ('block' == $form['#facetapi']['realm']['name']) {
       backdrop_set_message(t(
-        'To enable or arrange the facet blocks, visit the <a href="@block-page">blocks administration page</a>.', 
+        'To enable or arrange the facet blocks, visit the <a href="@block-page">blocks administration page</a>.',
         array('@block-page' => url('admin/structure/block', array('query' => array('destination' => current_path()))))
       ));
     }
@@ -495,7 +495,7 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
   }
 
   // Orders the sorts by the default weights set above.
-  uasort($form['#facetapi']['sort_info'], 'backdrop_sort_weight');
+  uasort($form['#facetapi']['sort_info'], 'facetapi_sort_weight');
 
   // Builds checkbox options and weight dropboxes.
   $sort_options = array();
@@ -846,7 +846,7 @@ function facetapi_facet_display_form_submit($form, &$form_state) {
   // Loads settings, saves all form values as settings other than excluded.
   $facet_settings = $adapter->getFacet($facet)->getSettings($realm);
   $facet_settings->settings = array_merge($facet_settings->settings, array_diff_key(
-    $form_state['values'], 
+    $form_state['values'],
     array_flip($form['#facetapi']['excluded_values'])
   ));
 
@@ -950,7 +950,7 @@ function facetapi_facet_filters_form($form, &$form_state, FacetapiAdapter $adapt
       );
     }
   }
-  uasort($plugins, 'backdrop_sort_weight');
+  uasort($plugins, 'facetapi_sort_weight');
 
   // Builds table, adds settings to vertical tabs.
   $has_settings = FALSE;

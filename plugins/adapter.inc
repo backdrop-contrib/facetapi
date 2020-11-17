@@ -1279,7 +1279,7 @@ class FacetapiFacet implements ArrayAccess {
     // Execute the filter plugins.
     // @todo Defensive coding here for filters?
     $enabled_filters = array_filter($settings->settings['filters'], 'facetapi_filter_disabled_filters');
-    uasort($enabled_filters, 'backdrop_sort_weight');
+    uasort($enabled_filters, 'facetapi_sort_weight');
     foreach ($enabled_filters as $filter_id => $filter_settings) {
       if ($class = facetapi_plugin_load_class('facetapi', 'filters', $filter_id, 'handler')) {
         $filter_plugin = new $class($filter_id, $this->adapter, $settings);
