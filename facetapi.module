@@ -108,7 +108,7 @@ function facetapi_hook_info() {
     ),
   );
 }
-
+ 
 /**
  * Implements hook_menu().
  */
@@ -659,7 +659,7 @@ function facetapi_get_realm_info() {
       );
     }
     backdrop_alter('facetapi_realm_info', $realm_info);
-    uasort($realm_info, 'facetapi_sort_weight');
+    uasort($realm_info, 'backdrop_sort_weight');
   }
   return $realm_info;
 }
@@ -757,7 +757,7 @@ function facetapi_get_facet_info($searcher) {
       // Invokes alter hook, sorts and returns.
       backdrop_alter('facetapi_facet_info', $facet_info[$searcher], $searcher_info[$searcher]);
       array_walk($facet_info[$searcher], 'facetapi_map_assoc', 'field api bundles');
-      uasort($facet_info[$searcher], 'facetapi_sort_weight');
+      uasort($facet_info[$searcher], 'backdrop_sort_weight');
 
       // Caches the result.
       cache_set($cid, $facet_info[$searcher], 'cache', CACHE_TEMPORARY);
@@ -1313,17 +1313,17 @@ function ctools_export_get_schema($table) {
 
     // Add some defaults
     $schema['export'] += array(
-      'key' => 'name',
-      'key name' => 'Name',
-      'object' => 'stdClass',
-      'status' => 'default_' . $table,
-      'default hook' => 'default_' . $table,
-      'can disable' => TRUE,
-      'identifier' => $table,
-      'primary key' => !empty($schema['primary key']) ? $schema['primary key'][0] : '',
-      'bulk export' => TRUE,
-      'list callback' => "$schema[module]_{$table}_list",
-      'to hook code callback' => "$schema[module]_{$table}_to_hook_code",
+      'key' => 'name', 
+      'key name' => 'Name', 
+      'object' => 'stdClass', 
+      'status' => 'default_' . $table, 
+      'default hook' => 'default_' . $table, 
+      'can disable' => TRUE, 
+      'identifier' => $table, 
+      'primary key' => !empty($schema['primary key']) ? $schema['primary key'][0] : '', 
+      'bulk export' => TRUE, 
+      'list callback' => "$schema[module]_{$table}_list", 
+      'to hook code callback' => "$schema[module]_{$table}_to_hook_code", 
       'export type string' => 'type',
     );
 
@@ -1632,28 +1632,4 @@ function ctools_export_crud_new($table, $set_defaults = TRUE) {
   else {
     return ctools_export_new_object($table, $set_defaults);
   }
-}
-
-/**
- * Sorts a structured array by the 'weight' element.
- *
- * Note that the sorting is by the 'weight' array element, not by the render
- * element property '#weight'.
- *
- * Callback for uasort() used in various functions.
- *
- * @param $a
- *   First item for comparison. The compared items should be associative arrays
- *   that optionally include a 'weight' element. For items without a 'weight'
- *   element, a default value of 0 will be used.
- * @param $b
- *   Second item for comparison.
- */
-function facetapi_sort_weight($a, $b) {
-  $a_weight = (is_array($a) && isset($a['weight'])) ? $a['weight'] : 0;
-  $b_weight = (is_array($b) && isset($b['weight'])) ? $b['weight'] : 0;
-  if ($a_weight == $b_weight) {
-    return 0;
-  }
-  return ($a_weight < $b_weight) ? -1 : 1;
 }
