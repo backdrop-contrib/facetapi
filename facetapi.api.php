@@ -538,7 +538,7 @@ function hook_facetapi_force_delta_mapping() {
  * @see https://www.drupal.org/node/1828396
  */
 function hook_facetapi_hash_alter(&$hash, $delta) {
-  $hash = drupal_html_class($hash);
+  $hash = backdrop_html_class($hash);
 }
 
 /**
