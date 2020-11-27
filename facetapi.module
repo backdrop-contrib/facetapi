@@ -78,6 +78,52 @@ define('FACETAPI_REGEX_DATE_RANGE', '/^\[(' . trim(FACETAPI_REGEX_DATE, '/^$') .
 // Calls block specific hooks and overrides.
 module_load_include('inc', 'facetapi', 'facetapi.block');
 
+/*
+ * Allows a config variable (name) to be set dynamically
+ *
+ * @param string $setting
+ *   The name of the configuration variable that is to be set
+ ^
+ * @param string $value
+ *   The value of the configuration variable
+ *
+ * @return string
+ *   Either the value that was set/get or NULL
+*/
+function facetapi_config($setting, $value = NULL) {
+	// check to see if the config is set
+	$id = db_query('SELECT id FROM {facetapi_config} WHERE id = :id', array(
+		':id' => $setting,
+	))->fetchField();
+	// if it's set we can return the value or update it
+	if ($id != FALSE) {
+		if ($value == NULL) {
+			$return = db_query('SELECT var FROM {facetapi_config} WHERE id = :id', array(
+				':id' => $id,
+			))->fetchField();
+		}
+		if ($value != NULL) {
+			$ret = db_update('facetapi_config')
+				->fields(array(
+					'var' => $value,
+				))->execute();
+			($ret) ? $return = $value : $return = NULL;
+		}
+	// if the id does not exist and we have a value save the setting
+	}
+	elseif ($id == FALSE && $value != NULL) {
+		$ret = db_insert('facetapi_config')
+			->fields(array(
+				'id' => $setting,
+				'var' => $value,
+			))->execute();
+		($ret) ? $return = $value : $return = NULL;
+	} else {
+		$return = NULL;
+	}
+	return $return;
+}
+
 /**
  * Implements hook_facetapi_hook_info().
  */
@@ -250,11 +296,9 @@ function facetapi_menu() {
  *   the array are specific to the plugin.
  */
 function facetapi_get_plugins($module, $type, $id = NULL) {
-
   module_load_include('inc', 'facetapi', 'facetapi.facetapi');
 	$facetApiPluginTypes = module_invoke_all($module . '_' . $type);
 	if (isset($facetApiPluginTypes[$id])) {
-#		dpm($facetApiPluginTypes[$id]); //---debug
 		return $facetApiPluginTypes[$id];
 	} else {
 
@@ -459,12 +503,9 @@ function facetapi_dependencies_load($facet_name, $searcher) {
  *   An array of FacetapiFilter objects, FALSE if no plugins.
  */
 function facetapi_filters_load($facet_name, $searcher) {
-
   $filters = array('plugins' => array());
   if ($filters['facet'] = facetapi_facet_load($facet_name, $searcher)) {
-
     $filters['plugins'] = facetapi_get_filters($filters['facet']);
-#    backdrop_set_message('<pre>' . print_r($filters, 1) . '</pre>'); //---debug
   }
   return ($filters['plugins']) ? $filters : FALSE;
 }
@@ -544,7 +585,6 @@ function facetapi_realm_load($realm_name) {
  */
 function facetapi_facet_load($facet_name, $searcher) {
   $facet_info = facetapi_get_facet_info($searcher);
- # backdrop_set_message('<pre>' . print_r($facet_info, 1) . '</pre>'); //---debug
   return (isset($facet_info[$facet_name])) ? $facet_info[$facet_name] : FALSE;
 }
 
@@ -769,14 +809,14 @@ function facetapi_get_facet_info($searcher) {
  * Implements hook_field_create_instance().
  */
 function facetapi_field_create_instance($instance) {
-  cache_clear_all('facetapi:facet_info:', 'cache', TRUE);
+  cache_clear_all();
 }
 
 /**
  * Implements hook_field_delete_instance().
  */
 function facetapi_field_delete_instance($instance) {
-  cache_clear_all('facetapi:facet_info:', 'cache', TRUE);
+  cache_clear_all();
 }
 
 /**
@@ -1203,8 +1243,7 @@ function facetapi_save_facet_status(FacetapiAdapter $adapter, array $realm, arra
     backdrop_static('facetapi_get_searcher_settings', array(), TRUE);
     backdrop_static('facetapi_get_enabled_facets', array(), TRUE);
     if ('block' == $realm['name']) {
-      cache_clear_all(NULL, 'cache_block');
-      cache_clear_all('facetapi:delta_map', 'cache');
+      cache_clear_all();
     }
   }
 

@@ -30,7 +30,6 @@ function facetapi_is_overridden(stdClass $settings) {
  * @ingroup forms
  */
 function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_name) {
-
   // Instantiates adapter, loads realm.
   $adapter = facetapi_adapter_load($searcher);
   $realm = facetapi_realm_load($realm_name);
@@ -129,30 +128,17 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
     '#default_value' => $default_value,
   );
 
-  // Checks whether block caching is enabled, sets description accordingly.
-  // TODO This variable was probably removed in Backdrop without replacement.
-#  if (!$disabled = (module_implements('node_grants') || !variable_get('block_cache', FALSE))) {
-	if (!$disabled = (module_implements('node_grants'))) {
-    $description = t('Configure the appropriate cache setting for facet blocks.');
-  }
-  else {
-    $description = t(
-      'To enable block caching, visit the <a href="@performance-page">performance page</a>.',
-      array('@performance-page' => url('admin/config/development/performance', array('query' => array('destination' => current_path()))))
-    );
-  }
   $form['block_cache'] = array(
     '#type' => 'select',
     '#access' => ('block' == $realm_name),
     '#title' => t('Block cache settings'),
-    '#disabled' => $disabled,
     '#options' => array(
       BACKDROP_NO_CACHE => t('Do not cache'),
       BACKDROP_CACHE_PER_ROLE | BACKDROP_CACHE_PER_PAGE => t('Per role'),
       BACKDROP_CACHE_PER_USER | BACKDROP_CACHE_PER_PAGE => t('Per user'),
     ),
-    '#default_value' => config_get('facetapi.settings', 'facetapi:block_cache:' . $searcher),
-    '#description' => $description,
+    '#default_value' => facetapi_config('facetapi:block_cache:' . $searcher),
+    '#description' => t('Configure the appropriate cache setting for facet blocks.'),
   );
 
   $form['actions'] = array(
@@ -209,17 +195,14 @@ function facetapi_realm_settings_form_submit($form, &$form_state) {
   // Saves block cache settings, clears block cache if setting was changed.
   if (isset($form_state['values']['block_cache'])) {
     $name = 'facetapi:block_cache:' . $adapter->getSearcher();
-    // TODO This variable was probably removed in Backdrop without replacement.
-    $original = variable_get($name, BACKDROP_NO_CACHE);
-    // TODO This variable was probably removed in Backdrop without replacement.
-    variable_set($name, $form_state['values']['block_cache']);
+    $original = facetapi_config($name);
+    facetapi_config($name, $form_state['values']['block_cache']);
     if ($original != $form_state['values']['block_cache']) {
-      cache_clear_all(NULL, 'cache_block');
+      cache_clear_all();
     }
   }
-
   // Clears delta map cache.
-  cache_clear_all('facetapi:delta_map', 'cache');
+  cache_clear_all();
 }
 
 /**

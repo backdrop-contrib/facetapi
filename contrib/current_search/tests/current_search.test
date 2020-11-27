@@ -154,7 +154,7 @@ class CurrentSearchBugFixTestCase extends CurrentSearchTestCase {
    * @see http://drupal.org/node/1728496
    */
   public function testPluralTranslation() {
-    variable_set('facetapi:translator_module', 'facetapi_test');
+    config_set('facetapi.settings', 'facetapi:translator_module', 'facetapi_test');
 
     // Enable the standard current search block via the UI.
     $this->backdropLogin($this->adminUser);
