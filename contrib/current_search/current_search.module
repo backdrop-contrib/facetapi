@@ -113,35 +113,6 @@ function current_search_theme() {
 }
 
 /**
- * Implements hook_ctools_plugin_api().
- */
-function current_search_ctools_plugin_api($owner, $api) {
-  if ('current_search' == $owner && 'current_search' == $api) {
-    return array('version' => 1);
-  }
-}
-
-/**
- * Implements hook_ctools_plugin_directory().
- */
-function current_search_ctools_plugin_directory($module, $type) {
-  if ('export_ui' == $type) {
-    return 'plugins/export_ui';
-  }
-}
-
-/**
- * Implements hook_ctools_plugin_type().
- */
-function current_search_ctools_plugin_type() {
-  return array(
-    'items' => array(
-      'use hooks' => TRUE,
-    ),
-  );
-}
-
-/**
  * Returns an array of available current search plugins.
  *
  * @return array
@@ -211,6 +182,168 @@ function current_search_current_search_items() {
     ),
   );
 }
+
+/*
+ *
+ */
+function current_search_export_crud_load_all($table, $reset = FALSE) {
+  $schema = current_search_export_get_schema($table);
+  if (empty($schema['export'])) {
+    return array();
+  }
+  $export = $schema['export'];
+  if (!empty($export['load all callback']) && function_exists($export['load all callback'])) {
+    return $export['load all callback']($reset);
+  }
+  else {
+    return current_search_export_load_object($table);
+  }
+}
+
+/*
+ *
+ */
+function current_search_export_get_schema($table) {
+  $cache = &backdrop_static(__FUNCTION__);
+   if (empty($cache[$table])) {
+     $schema = backdrop_get_schema($table);
+     // If our schema isn't loaded, it's possible we're in a state where it
+     // simply hasn't been cached. If we've been asked, let's force the
+     // issue.
+     if (!$schema || empty($schema['export'])) {
+       // force a schema reset:
+       $schema = backdrop_get_schema($table, TRUE);
+     }
+     if (!isset($schema['export'])) {
+       return array();
+     }
+     if (empty($schema['module'])) {
+       return array();
+     }
+     // Add some defaults
+     $schema['export'] += array(
+       'key' => 'name',
+       'key name' => 'Name',
+       'object' => 'stdClass',
+       'status' => 'default_' . $table,
+       'default hook' => 'default_' . $table,
+       'can disable' => TRUE,
+       'identifier' => $table,
+       'primary key' => !empty($schema['primary key']) ? $schema['primary key'][0] : '',
+       'bulk export' => TRUE,
+       'list callback' => "$schema[module]_{$table}_list",
+       'to hook code callback' => "$schema[module]_{$table}_to_hook_code",
+       'cache defaults' => FALSE,
+       'default cache bin' => 'cache',
+       'export type string' => 'type',
+     );
+     // If the export definition doesn't have the "primary key" then the CRUD
+     // save callback won't work.
+     if (empty($schema['export']['primary key']) && user_access('administer site configuration')) {
+       backdrop_set_message(t('The export definition of @table is missing the "primary key" property.', array('@table' => $table)), 'error');
+     }
+     $cache[$table] = $schema;
+   }
+   return $cache[$table];
+ }
+
+ /*
+  *
+  */
+  // TODO $type is always == 'all' so lets remove the cruft if we can
+ function current_search_export_load_object($table, $args = array()) {
+   $cache = &backdrop_static(__FUNCTION__);
+   $cached_database = &backdrop_static('ctools_export_load_object_all');
+   $schema = current_search_export_get_schema($table);
+   if (empty($schema)) {
+     return array();
+   }
+   $export = $schema['export'];
+   if (!isset($cache[$table])) {
+     $cache[$table] = array();
+   }
+   // If fetching all and cached all, we've done so and we are finished.
+   if ( !empty($cached_database[$table]) ) {
+     return $cache[$table];
+   }
+   // Build the query
+   $query = db_select($table, 't__0')->fields('t__0');
+   $alias_count = 1;
+   if (!empty($schema['join'])) {
+     foreach ($schema['join'] as $join_key => $join) {
+       if ($join_schema = backdrop_get_schema($join['table'])) {
+         $query->join($join['table'], 't__' . $alias_count, 't__0.' . $join['left_key'] . ' = ' . 't__' . $alias_count . '.' . $join['right_key']);
+         $query->fields('t__' . $alias_count);
+         $alias_count++;
+         // Allow joining tables to alter the query through a callback.
+         if (isset($join['callback']) && function_exists($join['callback'])) {
+           $join['callback']($query, $schema, $join_schema);
+         }
+       }
+     }
+   }
+   $result = $query->execute();
+
+   $status = variable_get($export['status'], array()); // TODO create a config for this
+   // Unpack the results of the query onto objects and cache them.
+   foreach ($result as $data) {
+     if (isset($schema['export']['object factory']) && function_exists($schema['export']['object factory'])) {
+       $object = $schema['export']['object factory']($schema, $data);
+     }
+     else {
+       $object = current_search_export_unpack_object($schema, $data, $export['object']);
+     }
+     $object->table = $table;
+     $object->{$export['export type string']} = t('Normal');
+     $object->export_type = EXPORT_IN_DATABASE;
+     // Determine if default object is enabled or disabled.
+     if (isset($status[$object->{$export['key']}])) {
+       $object->disabled = $status[$object->{$export['key']}];
+     }
+     $cache[$table][$object->{$export['key']}] = $object;
+   }
+   // Load subrecords.
+   if (isset($export['subrecords callback']) && function_exists($export['subrecords callback'])) {
+     $export['subrecords callback']($cache[$table]);
+   }
+     $cached_database[$table] = TRUE;
+     return $cache[$table];
+ }
+
+ /*
+  *
+  */
+ function current_search_export_unpack_object($schema, $data, $object = 'stdClass') {
+   if (is_string($object)) {
+     if (class_exists($object)) {
+       $object = new $object;
+     }
+     else {
+       $object = new stdClass;
+     }
+   }
+   // Go through our schema and build correlations.
+   foreach ($schema['fields'] as $field => $info) {
+     if (isset($data->$field)) {
+       $object->$field = empty($info['serialize']) ? $data->$field : unserialize($data->$field);
+     }
+     else {
+       $object->$field = NULL;
+     }
+   }
+   if (isset($schema['join'])) {
+     foreach ($schema['join'] as $join_key => $join) {
+       $join_schema = current_search_export_get_schema($join['table']);
+       if (!empty($join['load'])) {
+         foreach ($join['load'] as $field) {
+           $info = $join_schema['fields'][$field];
+           $object->$field = empty($info['serialize']) ? $data->$field : unserialize(db_decode_blob($data->$field));
+         }
+       }
+     }
+   }
+   return $object;
+ }
 
 /**
  * Implements hook_autoload_info().

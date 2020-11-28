@@ -58,10 +58,8 @@ function current_search_form_block_admin_configure_submit($form, &$form_state) {
  */
 function current_search_block_info() {
   $blocks = array();
-
   // Loads settings for enabled facets.
-  // cttools_include('export');
-  foreach (ctools_export_crud_load_all('current_search') as $config) {
+  foreach (current_search_export_crud_load_all('current_search') as $config) {
     if (empty($config->disabled)) {
       $blocks[$config->name] = array(
         'info' => 'Current search: ' . $config->label,
@@ -69,7 +67,6 @@ function current_search_block_info() {
       );
     }
   }
-
   // Returns available blocks.
   return $blocks;
 }

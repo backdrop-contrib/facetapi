@@ -93,8 +93,7 @@ function facetapi_get_block_cache_setting($searcher, $realm_name) {
   if ('block' != $realm_name) {
     $name .= ':' . $realm_name;
   }
-  // TODO This variable was probably removed in Backdrop without replacement.
-  return variable_get($name, BACKDROP_NO_CACHE);
+  return facetapi_config($name, BACKDROP_NO_CACHE);
 }
 
 /**
