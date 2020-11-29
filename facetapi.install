@@ -73,30 +73,36 @@ function facetapi_schema() {
     ),
     'primary key' => array('name'),
   );
-
+  $schema['facetapi_config'] = array(
+    'description' => 'Facetapi dynamic configuration storage',
+    'fields' => array(
+      'id' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'description' => 'Configuration variable ID',
+      ),
+      'var' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'description' => 'Configuration variable value',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
   return $schema;
 }
 
 /**
  * Implements hook_install().
  */
-function facetapi_install() {
-  // Nothing to do...
-  // Dynamically generated variable data was detected on the following lines.
-  // /facetapi/facetapi.admin.inc line 153
-}
+function facetapi_install() { }
 
 /**
  * Implements hook_uninstall().
  */
 function facetapi_uninstall() {
-  // Remove all variables that start with "facetapi:".
-  $args = array(':module' => 'facetapi%');
-  $result = db_query('SELECT name FROM {variable} WHERE name LIKE :module', $args);
-  foreach ($result as $record) {
-    // TODO This variable was probably removed in Backdrop without replacement.
-    variable_del($record->name);
-  }
   // Remove blocks.
   if (db_table_exists('block')) {
     db_delete('block')->condition('module', 'facetapi')->execute();
@@ -136,8 +142,34 @@ function facetapi_update_last_removed() {
  */
 function facetapi_update_1000() {
   $config = config('facetapi.settings');
-  $config->set('facetapiblock_cachesearcher', update_variable_get('facetapiblock_cachesearcher', 'dynamic variable in file /facetapi/facetapi.admin.inc line 153'));
+  $config->set('facetapi:block_cache:searcher', update_variable_get('facetapiblock_cachesearcher', ''));
   $config->set('facetapi:translator_module', update_variable_get('facetapi:translator_module', 'NULL'));
-  update_variable_del('facetapiblock_cachesearcher');
+  $config->save();
+  update_variable_del('facetapi:block_cache:searcher');
   update_variable_del('facetapi:translator_module');
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function facetapi_update_1001() {
+  $schema['facetapi_config'] = array(
+    'description' => 'Facetapi dynamic configuration storage',
+    'fields' => array(
+      'id' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'description' => 'Configuration variable ID',
+      ),
+      'var' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'description' => 'Configuration variable value',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  db_create_table('facetapi_config', $schema['facetapi_config']);
 }

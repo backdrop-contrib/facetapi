@@ -6,27 +6,6 @@
  */
 
 /**
- * Deletes object and block visibility information from the database.
- *
- * @param stdClass $object
- *   The object being deleted.
- */
-function current_search_export_crud_delete($object) {
-  // Deletes the current search block configuration.
-  db_delete('current_search')
-    ->condition('name', $object->name)
-    ->execute();
-
-  // Only deletes the association with the searcher if we are not reverting a
-  // configuration setting.
-  if (!($object->export_type & EXPORT_IN_CODE && $object->export_type & EXPORT_IN_DATABASE)) {
-    db_delete('block_current_search')
-      ->condition('delta', $object->name)
-      ->execute();
-  }
-}
-
-/**
  * Implements hook_current_search_default_items().
  */
 function current_search_current_search_default_items() {
