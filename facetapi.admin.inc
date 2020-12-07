@@ -128,19 +128,6 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
     '#default_value' => $default_value,
   );
 
-  $form['block_cache'] = array(
-    '#type' => 'select',
-    '#access' => ('block' == $realm_name),
-    '#title' => t('Block cache settings'),
-    '#options' => array(
-      BACKDROP_NO_CACHE => t('Do not cache'),
-      BACKDROP_CACHE_PER_ROLE | BACKDROP_CACHE_PER_PAGE => t('Per role'),
-      BACKDROP_CACHE_PER_USER | BACKDROP_CACHE_PER_PAGE => t('Per user'),
-    ),
-    '#default_value' => facetapi_config('facetapi:block_cache:' . $searcher),
-    '#description' => t('Configure the appropriate cache setting for facet blocks.'),
-  );
-
   $form['actions'] = array(
     '#type' => 'actions',
     '#weight' => 20,
@@ -189,16 +176,6 @@ function facetapi_realm_settings_form_submit($form, &$form_state) {
         'To enable or arrange the facet blocks, visit the <a href="@block-page">blocks administration page</a>.',
         array('@block-page' => url('admin/structure/block', array('query' => array('destination' => current_path()))))
       ));
-    }
-  }
-
-  // Saves block cache settings, clears block cache if setting was changed.
-  if (isset($form_state['values']['block_cache'])) {
-    $name = 'facetapi:block_cache:' . $adapter->getSearcher();
-    $original = facetapi_config($name);
-    facetapi_config($name, $form_state['values']['block_cache']);
-    if ($original != $form_state['values']['block_cache']) {
-      cache_clear_all();
     }
   }
   // Clears delta map cache.

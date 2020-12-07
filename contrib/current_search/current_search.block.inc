@@ -63,7 +63,6 @@ function current_search_block_info() {
     if (empty($config->disabled)) {
       $blocks[$config->name] = array(
         'info' => 'Current search: ' . $config->label,
-        'cache' => BACKDROP_NO_CACHE,
       );
     }
   }

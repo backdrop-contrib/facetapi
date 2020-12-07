@@ -66,14 +66,6 @@ class current_search_export_ui {
   function edit_page($js, $input, $item, $step = NULL) {
     backdrop_set_title($this->get_page_title('edit', $item));
 
-    // Check to see if there is a cached item to get if we're using the wizard.
-    if (!empty($this->plugin['use wizard'])) {
-      $cached = $this->edit_cache_get($item, 'edit');
-      if (!empty($cached)) {
-        $item = $cached;
-      }
-    }
-
     $form_state = array(
       'plugin' => $this->plugin,
       'object' => &$this,
@@ -107,16 +99,9 @@ class current_search_export_ui {
    * @see http://drupal.org/node/1373048
    */
   function add_page($js, $input, $step = NULL) {
-    backdrop_set_title($this->get_page_title('add'));
 
-    // If a step not set, they are trying to create a new item. If a step
-    // is set, they're in the process of creating an item.
-    if (!empty($this->plugin['use wizard']) && !empty($step)) {
-      $item = $this->edit_cache_get(NULL, 'add');
-    }
-    if (empty($item)) {
-      $item = facetapi_export_crud_new($this->plugin['schema']);
-    }
+    backdrop_set_title($this->get_page_title('add'));
+    $item = facetapi_export_crud_new($this->plugin['schema']);
 
     $form_state = array(
       'plugin' => $this->plugin,
