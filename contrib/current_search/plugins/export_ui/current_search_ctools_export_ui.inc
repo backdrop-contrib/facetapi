@@ -24,6 +24,6 @@ $plugin = array(
   ),
   'handler' => array(
     'class' => 'current_search_export_ui',
-    'parent' => 'ctools_export_ui',
+    'parent' => 'currentsearch_export_ui',
   ),
 );

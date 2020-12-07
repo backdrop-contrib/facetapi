@@ -8,10 +8,9 @@
 /**
  * CTools export UI extending class. Slightly customized for Context.
  */
-class current_search_export_ui extends ctools_export_ui {
+class current_search_export_ui {
 
   /**
-   * Overrides ctools_export_ui::list_form().
    *
    * Simplifies the form similar to how the Context module does it.
    */
@@ -24,14 +23,12 @@ class current_search_export_ui extends ctools_export_ui {
   }
 
   /**
-   * Overrides ctools_export_ui::list_build_row().
    */
   function list_build_row($item, &$form_state, $operations) {
     parent::list_build_row($item, $form_state, $operations);
   }
 
   /**
-   * Overrides ctools_export_ui::edit_execute_form().
    *
    * This is hacky, but since CTools Export UI uses backdrop_goto() we have to
    * effectively change the plugin to modify the redirect path dynamically.
@@ -61,7 +58,6 @@ class current_search_export_ui extends ctools_export_ui {
   }
 
   /**
-   * Overrides ctools_export_ui::edit_page().
    *
    * Allows passing of options to backdrop_goto() as opposed to just a path.
    *
@@ -69,14 +65,6 @@ class current_search_export_ui extends ctools_export_ui {
    */
   function edit_page($js, $input, $item, $step = NULL) {
     backdrop_set_title($this->get_page_title('edit', $item));
-
-    // Check to see if there is a cached item to get if we're using the wizard.
-    if (!empty($this->plugin['use wizard'])) {
-      $cached = $this->edit_cache_get($item, 'edit');
-      if (!empty($cached)) {
-        $item = $cached;
-      }
-    }
 
     $form_state = array(
       'plugin' => $this->plugin,
@@ -97,7 +85,7 @@ class current_search_export_ui extends ctools_export_ui {
       // @see http://drupal.org/node/1373048
       $export_key = $this->plugin['export']['key'];
       $args = (array) $this->plugin['redirect']['edit'];
-      $args[0] = str_replace('%ctools_export_ui', $form_state['item']->{$export_key}, $args[0]);
+      $args[0] = str_replace('%currentsearch_export_ui', $form_state['item']->{$export_key}, $args[0]);
       call_user_func_array('backdrop_goto', $args);
     }
 
@@ -105,23 +93,15 @@ class current_search_export_ui extends ctools_export_ui {
   }
 
    /**
-   * Overrides ctools_export_ui::add_page().
    *
    * Allows passing of options to backdrop_goto() as opposed to just a path.
    *
    * @see http://drupal.org/node/1373048
    */
   function add_page($js, $input, $step = NULL) {
-    backdrop_set_title($this->get_page_title('add'));
 
-    // If a step not set, they are trying to create a new item. If a step
-    // is set, they're in the process of creating an item.
-    if (!empty($this->plugin['use wizard']) && !empty($step)) {
-      $item = $this->edit_cache_get(NULL, 'add');
-    }
-    if (empty($item)) {
-      $item = ctools_export_crud_new($this->plugin['schema']);
-    }
+    backdrop_set_title($this->get_page_title('add'));
+    $item = facetapi_export_crud_new($this->plugin['schema']);
 
     $form_state = array(
       'plugin' => $this->plugin,
@@ -142,7 +122,7 @@ class current_search_export_ui extends ctools_export_ui {
       // @see @see http://drupal.org/node/1373048
       $export_key = $this->plugin['export']['key'];
       $args = (array) $this->plugin['redirect']['add'];
-      $args[0] = str_replace('%ctools_export_ui', $form_state['item']->{$export_key}, $args[0]);
+      $args[0] = str_replace('%currentsearch_export_ui', $form_state['item']->{$export_key}, $args[0]);
       call_user_func_array('backdrop_goto', $args);
     }
 
@@ -594,7 +574,7 @@ function current_search_delete_item_form_submit($form, &$form_state) {
  *   A boolean flagging whether the item exists.
  */
 function current_search_config_exists($name) {
-  $configs = ctools_export_crud_load_all('current_search');
+  $configs = current_search_export_crud_load_all('current_search');
   return isset($configs[$name]);
 }
 

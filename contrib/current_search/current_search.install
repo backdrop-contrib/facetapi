@@ -18,7 +18,7 @@ function current_search_schema() {
       'key' => 'name',
       'identifier' => 'item',
       'default hook' => 'current_search_default_items',
-      'delete callback' => 'current_search_export_crud_delete',
+      'delete callback' => 'facetapi_export_crud_delete',
       'api' => array(
         'owner' => 'current_search',
         'api' => 'current_search',

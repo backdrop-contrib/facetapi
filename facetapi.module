@@ -78,52 +78,6 @@ define('FACETAPI_REGEX_DATE_RANGE', '/^\[(' . trim(FACETAPI_REGEX_DATE, '/^$') .
 // Calls block specific hooks and overrides.
 module_load_include('inc', 'facetapi', 'facetapi.block');
 
-/*
- * Allows a config variable (name) to be set dynamically
- *
- * @param string $setting
- *   The name of the configuration variable that is to be set
- ^
- * @param string $value
- *   The value of the configuration variable
- *
- * @return string
- *   Either the value that was set/get or NULL
-*/
-function facetapi_config($setting, $value = NULL) {
-	// check to see if the config is set
-	$id = db_query('SELECT id FROM {facetapi_config} WHERE id = :id', array(
-		':id' => $setting,
-	))->fetchField();
-	// if it's set we can return the value or update it
-	if ($id != FALSE) {
-		if ($value == NULL) {
-			$return = db_query('SELECT var FROM {facetapi_config} WHERE id = :id', array(
-				':id' => $id,
-			))->fetchField();
-		}
-		if ($value != NULL) {
-			$ret = db_update('facetapi_config')
-				->fields(array(
-					'var' => $value,
-				))->execute();
-			($ret) ? $return = $value : $return = NULL;
-		}
-	// if the id does not exist and we have a value save the setting
-	}
-	elseif ($id == FALSE && $value != NULL) {
-		$ret = db_insert('facetapi_config')
-			->fields(array(
-				'id' => $setting,
-				'var' => $value,
-			))->execute();
-		($ret) ? $return = $value : $return = NULL;
-	} else {
-		$return = NULL;
-	}
-	return $return;
-}
-
 /**
  * Implements hook_facetapi_hook_info().
  */
@@ -297,13 +251,13 @@ function facetapi_menu() {
  */
 function facetapi_get_plugins($module, $type, $id = NULL) {
   module_load_include('inc', 'facetapi', 'facetapi.facetapi');
-	$facetApiPluginTypes = module_invoke_all($module . '_' . $type);
-	if (isset($facetApiPluginTypes[$id])) {
-		return $facetApiPluginTypes[$id];
-	} else {
+  $facetApiPluginTypes = module_invoke_all($module . '_' . $type);
+  if (isset($facetApiPluginTypes[$id])) {
+    return $facetApiPluginTypes[$id];
+  } else {
 
-		return $facetApiPluginTypes;
-	}
+    return $facetApiPluginTypes;
+  }
 }
 
 function facetapi_plugin_load_class($module, $type, $id, $class_name) {
@@ -454,7 +408,6 @@ function facetapi_adapter_load($searcher) {
   if (!isset($adapters[$searcher])) {
     $searcher_info = facetapi_get_searcher_info();
     if (isset($searcher_info[$searcher]['adapter'])) {
-      // // cttools_include('plugins');
       $id = $searcher_info[$searcher]['adapter'];
       $class = facetapi_plugin_load_class('facetapi', 'adapters', $id, 'handler');
       $adapters[$searcher] = ($class) ? new $class($searcher_info[$searcher]) : FALSE;
@@ -923,9 +876,8 @@ function facetapi_get_filters(array $facet) {
 function facetapi_get_searcher_settings($searcher) {
   $settings = &backdrop_static(__FUNCTION__, array());
   if (!isset($settings[$searcher])) {
-    // cttools_include('export');
     $args = array('searcher' => $searcher);
-    $settings[$searcher] = ctools_export_load_object('facetapi', 'conditions', $args);
+    $settings[$searcher] = facetapi_export_load_object('facetapi', 'conditions', $args);
   }
   return $settings[$searcher];
 }
@@ -1336,65 +1288,42 @@ function facetapi_autoload_info() {
   );
 }
 
-function ctools_export_get_schema($table) {
-  $cache = &backdrop_static(__FUNCTION__);
-  if (empty($cache[$table])) {
-    $schema = backdrop_get_schema($table);
+function facetapi_export_get_schema($table) {
+  $container = array();
+  $schema = backdrop_get_schema($table);
 
-    if (!isset($schema['export'])) {
-      return array();
-    }
-
-    if (empty($schema['module'])) {
-      return array();
-    }
-
-    // Add some defaults
-    $schema['export'] += array(
-      'key' => 'name',
-      'key name' => 'Name',
-      'object' => 'stdClass',
-      'status' => 'default_' . $table,
-      'default hook' => 'default_' . $table,
-      'can disable' => TRUE,
-      'identifier' => $table,
-      'primary key' => !empty($schema['primary key']) ? $schema['primary key'][0] : '',
-      'bulk export' => TRUE,
-      'list callback' => "$schema[module]_{$table}_list",
-      'to hook code callback' => "$schema[module]_{$table}_to_hook_code",
-      'export type string' => 'type',
-    );
-
-    // If the export definition doesn't have the "primary key" then the CRUD
-    // save callback won't work.
-    if (empty($schema['export']['primary key']) && user_access('administer site configuration')) {
-      backdrop_set_message(t('The export definition of @table is missing the "primary key" property.', array('@table' => $table)), 'error');
-    }
-
-    // Notes:
-    // The following callbacks may be defined to override default behavior
-    // when using CRUD functions:
-    //
-    // create callback
-    // load callback
-    // load all callback
-    // save callback
-    // delete callback
-    // export callback
-    // import callback
-    //
-    // See the appropriate ctools_export_crud function for details on what
-    // arguments these callbacks should accept. Please do not call these
-    // directly, always use the ctools_export_crud_* wrappers to ensure
-    // that default implementations are honored.
-    $cache[$table] = $schema;
+  if (!isset($schema['export'])) {
+    return array();
   }
-
-  return $cache[$table];
+  if (empty($schema['module'])) {
+    return array();
+  }
+  // Add some defaults
+  $schema['export'] += array(
+    'key' => 'name',
+    'key name' => 'Name',
+    'object' => 'stdClass',
+    'status' => 'default_' . $table,
+    'default hook' => 'default_' . $table,
+    'can disable' => TRUE,
+    'identifier' => $table,
+    'primary key' => !empty($schema['primary key']) ? $schema['primary key'][0] : '',
+    'bulk export' => TRUE,
+    'list callback' => "$schema[module]_{$table}_list",
+    'to hook code callback' => "$schema[module]_{$table}_to_hook_code",
+    'export type string' => 'type',
+  );
+  // If the export definition doesn't have the "primary key" then the CRUD
+  // save callback won't work.
+  if (empty($schema['export']['primary key']) && user_access('administer site configuration')) {
+    backdrop_set_message(t('The export definition of @table is missing the "primary key" property.', array('@table' => $table)), 'error');
+  }
+  $container[$table] = $schema;
+  return $container[$table];
 }
 
 function facetapi_export_crud_save($table, &$object) {
-  $schema = ctools_export_get_schema($table);
+  $schema = facetapi_export_get_schema($table);
   $export = $schema['export'];
 
   if (!empty($export['save callback']) && function_exists($export['save callback'])) {
@@ -1420,7 +1349,7 @@ function facetapi_export_crud_save($table, &$object) {
   }
 }
 
-function ctools_var_export($var, $prefix = '') {
+function facetapi_var_export($var, $prefix = '') {
   if (is_array($var)) {
     if (empty($var)) {
       $output = 'array()';
@@ -1428,7 +1357,7 @@ function ctools_var_export($var, $prefix = '') {
     else {
       $output = "array(\n";
       foreach ($var as $key => $value) {
-        $output .= $prefix . "  " . ctools_var_export($key) . " => " . ctools_var_export($value, $prefix . '  ') . ",\n";
+        $output .= $prefix . "  " . facetapi_var_export($key) . " => " . facetapi_var_export($value, $prefix . '  ') . ",\n";
       }
       $output .= $prefix . ')';
     }
@@ -1439,7 +1368,7 @@ function ctools_var_export($var, $prefix = '') {
     // magic method __set_state() leaving the export broken. This
     // workaround avoids this by casting the object as an array for
     // export and casting it back to an object when evaluated.
-    $output = '(object) ' . ctools_var_export((array) $var, $prefix);
+    $output = '(object) ' . facetapi_var_export((array) $var, $prefix);
   }
   elseif (is_bool($var)) {
     $output = $var ? 'TRUE' : 'FALSE';
@@ -1450,8 +1379,8 @@ function ctools_var_export($var, $prefix = '') {
   return $output;
 }
 
-function ctools_export_object($table, $object, $indent = '', $identifier = NULL, $additions = array(), $additions2 = array()) {
-  $schema = ctools_export_get_schema($table);
+function facetapi_export_object($table, $object, $indent = '', $identifier = NULL, $additions = array(), $additions2 = array()) {
+  $schema = facetapi_export_get_schema($table);
   if (!isset($identifier)) {
     $identifier = $schema['export']['identifier'];
   }
@@ -1466,7 +1395,7 @@ function ctools_export_object($table, $object, $indent = '', $identifier = NULL,
 
   // Put top additions here:
   foreach ($additions as $field => $value) {
-    $output .= $indent . '$' . $identifier . '->' . $field . ' = ' . ctools_var_export($value, $indent) . ";\n";
+    $output .= $indent . '$' . $identifier . '->' . $field . ' = ' . facetapi_var_export($value, $indent) . ";\n";
   }
   $fields = $schema['fields'];
   if (!empty($schema['join'])) {
@@ -1508,25 +1437,25 @@ function ctools_export_object($table, $object, $indent = '', $identifier = NULL,
           $value = (int) $value;
         }
       }
-      $output .= $indent . '$' . $identifier . '->' . $field . ' = ' . ctools_var_export($value, $indent) . ";\n";
+      $output .= $indent . '$' . $identifier . '->' . $field . ' = ' . facetapi_var_export($value, $indent) . ";\n";
     }
   }
 
   // And bottom additions here.
   foreach ($additions2 as $field => $value) {
-    $output .= $indent . '$' . $identifier . '->' . $field . ' = ' . ctools_var_export($value, $indent) . ";\n";
+    $output .= $indent . '$' . $identifier . '->' . $field . ' = ' . facetapi_var_export($value, $indent) . ";\n";
   }
   return $output;
 }
 
 function facetapi_export_crud_export($table, $object, $indent = '') {
-  $schema = ctools_export_get_schema($table);
+  $schema = facetapi_export_get_schema($table);
   $export = $schema['export'];
   if (!empty($export['export callback']) && function_exists($export['export callback'])) {
     return $export['export callback']($object, $indent);
   }
   else {
-    return ctools_export_object($table, $object, $indent);
+    return facetapi_export_object($table, $object, $indent);
   }
 }
 
@@ -1534,7 +1463,8 @@ function facetapi_ctools_export_form($table, $object, $indent = '', $indent2 = '
   return '';
 }
 
-function _ctools_export_unpack_object($schema, $data, $object = 'stdClass') {
+
+function facetapi_export_unpack_object($schema, $data, $object = 'stdClass') {
   if (is_string($object)) {
     if (class_exists($object)) {
       $object = new $object;
@@ -1556,7 +1486,7 @@ function _ctools_export_unpack_object($schema, $data, $object = 'stdClass') {
 
   if (isset($schema['join'])) {
     foreach ($schema['join'] as $join_key => $join) {
-      $join_schema = ctools_export_get_schema($join['table']);
+      $join_schema = facetapi_export_get_schema($join['table']);
       if (!empty($join['load'])) {
         foreach ($join['load'] as $field) {
           $info = $join_schema['fields'][$field];
@@ -1569,11 +1499,13 @@ function _ctools_export_unpack_object($schema, $data, $object = 'stdClass') {
   return $object;
 }
 
-function ctools_export_load_object($table, $type = 'all', $args = array()) {
-  $cache = &backdrop_static(__FUNCTION__);
-  $cached_database = &backdrop_static('ctools_export_load_object_all');
 
-  $schema = ctools_export_get_schema($table);
+
+function facetapi_export_load_object($table, $type = 'all', $args = array()) {
+  $cache = &backdrop_static(__FUNCTION__);
+  $cached_database = &backdrop_static('facetapi_export_load_object_all');
+
+  $schema = facetapi_export_get_schema($table);
   if (empty($schema)) {
     return array();
   }
@@ -1607,12 +1539,12 @@ function ctools_export_load_object($table, $type = 'all', $args = array()) {
 
   $result = $query->execute();
 
-	$status = config_get('facetapi.settings', 'default_facetapi');
-	if ($status != $export['status']) {
-		# update from default
-		config_set('facetapi.settings', 'default_facetapi', $export['status']);
-		$status = $export['status'];
-	}
+  $status = config_get('facetapi.settings', 'default_facetapi');
+  if ($status != $export['status']) {
+    # update from default
+    config_set('facetapi.settings', 'default_facetapi', $export['status']);
+    $status = $export['status'];
+  }
 
   // Unpack the results of the query onto objects and cache them.
   foreach ($result as $data) {
@@ -1620,7 +1552,7 @@ function ctools_export_load_object($table, $type = 'all', $args = array()) {
       $object = $schema['export']['object factory']($schema, $data);
     }
     else {
-      $object = _ctools_export_unpack_object($schema, $data, $export['object']);
+      $object = facetapi_export_unpack_object($schema, $data, $export['object']);
     }
     $object->table = $table;
     $object->{$export['export type string']} = t('Normal');
@@ -1639,8 +1571,10 @@ function ctools_export_load_object($table, $type = 'all', $args = array()) {
   return $return;
 }
 
-function ctools_export_new_object($table, $set_defaults = TRUE) {
-  $schema = ctools_export_get_schema($table);
+
+
+function facetapi_export_new_object($table, $set_defaults = TRUE) {
+  $schema = facetapi_export_get_schema($table);
   $export = $schema['export'];
 
   $object = new $export['object'];
@@ -1666,15 +1600,15 @@ function ctools_export_new_object($table, $set_defaults = TRUE) {
   return $object;
 }
 
-function ctools_export_crud_new($table, $set_defaults = TRUE) {
-  $schema = ctools_export_get_schema($table);
+function facetapi_export_crud_new($table, $set_defaults = TRUE) {
+  $schema = facetapi_export_get_schema($table);
   $export = $schema['export'];
 
   if (!empty($export['create callback']) && function_exists($export['create callback'])) {
     return $export['create callback']($set_defaults);
   }
   else {
-    return ctools_export_new_object($table, $set_defaults);
+    return facetapi_export_new_object($table, $set_defaults);
   }
 }
 
@@ -1700,4 +1634,25 @@ function facetapi_sort_weight($a, $b) {
     return 0;
   }
   return ($a_weight < $b_weight) ? -1 : 1;
+}
+
+/**
+ * Deletes object and block visibility information from the database.
+ *
+ * @param stdClass $object
+ *   The object being deleted.
+ */
+function facetapi_export_crud_delete($object) {
+  // Deletes the current search block configuration.
+  db_delete('current_search')
+    ->condition('name', $object->name)
+    ->execute();
+
+  // Only deletes the association with the searcher if we are not reverting a
+  // configuration setting.
+  if (!($object->export_type & EXPORT_IN_CODE && $object->export_type & EXPORT_IN_DATABASE)) {
+    db_delete('block_current_search')
+      ->condition('delta', $object->name)
+      ->execute();
+  }
 }

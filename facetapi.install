@@ -73,24 +73,6 @@ function facetapi_schema() {
     ),
     'primary key' => array('name'),
   );
-	$schema['facetapi_config'] = array(
-		'description' => 'Facetapi dynamic configuration storage',
-		'fields' => array(
-			'id' => array(
-				'type' => 'varchar',
-				'length' => 128,
-				'not null' => TRUE,
-				'description' => 'Configuration variable ID',
-			),
-			'var' => array(
-				'type' => 'varchar',
-				'length' => 128,
-				'not null' => TRUE,
-				'description' => 'Configuration variable value',
-			),
-		),
-		'primary key' => array('id'),
-	);
   return $schema;
 }
 
@@ -142,35 +124,8 @@ function facetapi_update_last_removed() {
  */
 function facetapi_update_1000() {
   $config = config('facetapi.settings');
-  $config->set('facetapi:block_cache:searcher', update_variable_get('facetapiblock_cachesearcher', ''));
   $config->set('facetapi:translator_module', update_variable_get('facetapi:translator_module', 'NULL'));
-	$config->save();
+  $config->save();
   update_variable_del('facetapi:block_cache:searcher');
   update_variable_del('facetapi:translator_module');
-}
-
-/**
- * Implements hook_update_N().
- */
-function facetapi_update_1001() {
-	$schema['facetapi_config'] = array(
-		'description' => 'Facetapi dynamic configuration storage',
-		'fields' => array(
-			'id' => array(
-				'type' => 'varchar',
-				'length' => 128,
-				'not null' => TRUE,
-				'description' => 'Configuration variable ID',
-			),
-			'var' => array(
-				'type' => 'varchar',
-				'length' => 128,
-				'not null' => TRUE,
-				'description' => 'Configuration variable value',
-			),
-		),
-		'primary key' => array('id'),
-	);
-  db_create_table('facetapi_config', $schema['facetapi_config']);
-
 }

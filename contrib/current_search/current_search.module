@@ -63,7 +63,7 @@ function current_search_menu_alter(&$items) {
   }
 
   // Ensures that the edit link shows up in contextual links.
-  $item = &$items['admin/config/search/current_search/list/%ctools_export_ui/edit'];
+  $item = &$items['admin/config/search/current_search/list/%currentsearch_export_ui/edit'];
   $item['title'] = 'Configure current search items';
   $item['type'] = MENU_LOCAL_ACTION;
   $item['context'] = MENU_CONTEXT_INLINE;
@@ -113,35 +113,6 @@ function current_search_theme() {
 }
 
 /**
- * Implements hook_ctools_plugin_api().
- */
-function current_search_ctools_plugin_api($owner, $api) {
-  if ('current_search' == $owner && 'current_search' == $api) {
-    return array('version' => 1);
-  }
-}
-
-/**
- * Implements hook_ctools_plugin_directory().
- */
-function current_search_ctools_plugin_directory($module, $type) {
-  if ('export_ui' == $type) {
-    return 'plugins/export_ui';
-  }
-}
-
-/**
- * Implements hook_ctools_plugin_type().
- */
-function current_search_ctools_plugin_type() {
-  return array(
-    'items' => array(
-      'use hooks' => TRUE,
-    ),
-  );
-}
-
-/**
  * Returns an array of available current search plugins.
  *
  * @return array
@@ -181,8 +152,7 @@ function current_search_get_searcher_options() {
  *   An object containing the configuration, FALSE if not defined.
  */
 function current_search_item_load($name) {
-  // cttools_include('export');
-  $result = ctools_export_crud_load('current_search', $name);
+  $result = current_search_export_crud_load('current_search', $name);
   return $result ? $result : FALSE;
 }
 
@@ -211,6 +181,43 @@ function current_search_current_search_items() {
     ),
   );
 }
+
+/*
+ *
+ */
+function current_search_export_crud_load($table, $name) {
+  $schema = facetapi_export_get_schema($table);
+  $export = $schema['export'];
+
+  if (!empty($export['load callback']) && function_exists($export['load callback'])) {
+    return $export['load callback']($name);
+  }
+  else {
+    $result = facetapi_export_load_object($table, 'names', array($name));
+    if (isset($result[$name])) {
+      return $result[$name];
+    }
+  }
+}
+
+/*
+ *
+ */
+function current_search_export_crud_load_all($table, $reset = FALSE) {
+  $schema = facetapi_export_get_schema($table);
+  if (empty($schema['export'])) {
+    return array();
+  }
+  $export = $schema['export'];
+  if (!empty($export['load all callback']) && function_exists($export['load all callback'])) {
+    return $export['load all callback']($reset);
+  }
+  else {
+    return facetapi_export_load_object($table);
+  }
+}
+
+
 
 /**
  * Implements hook_autoload_info().

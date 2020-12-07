@@ -1,6 +1,5 @@
 {
     "_config_name": "facetapi.settings",
-    "facetapi:block_cache:searcher": "",
     "facetapi:translator_module": "",
 		"default_facetapi": []
 }

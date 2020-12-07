@@ -716,12 +716,12 @@ abstract class FacetapiAdapter {
    * @return stdClass
    *   An object containing the initialized settings.
    *
-   * @see ctools_export_crud_new()
+   * @see facetapi_export_crud_new()
    */
   public function initSettingsObject($name, $facet_name, $realm_name = NULL) {
     $cached_settings = facetapi_get_searcher_settings($this->info['name']);
     if (!isset($cached_settings[$name])) {
-      $settings = ctools_export_crud_new('facetapi');
+      $settings = facetapi_export_crud_new('facetapi');
       $settings->name = $name;
       $settings->searcher = $this->info['name'];
       $settings->realm = (string) $realm_name;
@@ -751,7 +751,7 @@ abstract class FacetapiAdapter {
    *   An object containing the settings.
    *
    * @see FacetapiAdapter::initSettingsObject()
-   * @see ctools_export_crud_load()
+   * @see current_search_export_crud_load()
    */
   public function getFacetSettings(array $facet, array $realm) {
     // Build the unique name of the configuration and check whether the setting
@@ -829,7 +829,7 @@ abstract class FacetapiAdapter {
    * @return
    *   An object containing the settings.
    *
-   * @see ctools_export_crud_load()
+   * @see current_search_export_crud_load()
    */
   public function getFacetSettingsGlobal(array $facet) {
     // Build the unique name of the configuration and check whether the setting
