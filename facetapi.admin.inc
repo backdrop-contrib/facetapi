@@ -30,7 +30,6 @@ function facetapi_is_overridden(stdClass $settings) {
  * @ingroup forms
  */
 function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_name) {
-
   // Instantiates adapter, loads realm.
   $adapter = facetapi_adapter_load($searcher);
   $realm = facetapi_realm_load($realm_name);
@@ -94,12 +93,11 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
         'href' => facetapi_get_settings_path($searcher, $realm['name'], $facet_name, 'revert'),
       );
     }
-
     $form['table']['operations'][$facet_name] = array(
-      '#theme' => 'links__ctools_dropbutton',
+      '#type' => 'dropbutton',
       '#links' => $operations,
       '#attributes' => array(
-        'class' => array('inline', 'links', 'actions', 'horizontal', 'right'),
+        'class' => array('dropbutton'),
       ),
     );
 
@@ -122,37 +120,12 @@ function facetapi_realm_settings_form($form, &$form_state, $searcher, $realm_nam
   }
 
   // Sorts by the weight appended above.
-  uasort($form['#facetapi']['facet_info'], 'backdrop_sort_weight');
+  uasort($form['#facetapi']['facet_info'], 'facetapi_sort_weight');
 
   $form['table']['enabled_facets'] = array(
     '#type' => 'checkboxes',
     '#options' => $options,
     '#default_value' => $default_value,
-  );
-
-  // Checks whether block caching is enabled, sets description accordingly.
-  // TODO This variable was probably removed in Backdrop without replacement.
-  if (!$disabled = (module_implements('node_grants') || !variable_get('block_cache', FALSE))) {
-    $description = t('Configure the appropriate cache setting for facet blocks.');
-  }
-  else {
-    $description = t(
-      'To enable block caching, visit the <a href="@performance-page">performance page</a>.', 
-      array('@performance-page' => url('admin/config/development/performance', array('query' => array('destination' => current_path()))))
-    );
-  }
-  $form['block_cache'] = array(
-    '#type' => 'select',
-    '#access' => ('block' == $realm_name),
-    '#title' => t('Block cache settings'),
-    '#disabled' => $disabled,
-    '#options' => array(
-      BACKDROP_NO_CACHE => t('Do not cache'),
-      BACKDROP_CACHE_PER_ROLE | BACKDROP_CACHE_PER_PAGE => t('Per role'),
-      BACKDROP_CACHE_PER_USER | BACKDROP_CACHE_PER_PAGE => t('Per user'),
-    ),
-    '#default_value' => config_get('facetapi.settings', 'facetapi:block_cache:' . $searcher),
-    '#description' => $description,
   );
 
   $form['actions'] = array(
@@ -188,7 +161,7 @@ function facetapi_realm_settings_form_submit($form, &$form_state) {
     if (!facetapi_save_facet_status($adapter, $realm, $facet, $status, $weight, TRUE)) {
       $success = FALSE;
       $message = t(
-        'Error saving configuration options for the %label facet.', 
+        'Error saving configuration options for the %label facet.',
         array('%label' => $facet['label'])
       );
       backdrop_set_message($message, 'error');
@@ -200,26 +173,13 @@ function facetapi_realm_settings_form_submit($form, &$form_state) {
     backdrop_set_message(t('The configuration options have been saved.'));
     if ('block' == $form['#facetapi']['realm']['name']) {
       backdrop_set_message(t(
-        'To enable or arrange the facet blocks, visit the <a href="@block-page">blocks administration page</a>.', 
+        'To enable or arrange the facet blocks, visit the <a href="@block-page">blocks administration page</a>.',
         array('@block-page' => url('admin/structure/block', array('query' => array('destination' => current_path()))))
       ));
     }
   }
-
-  // Saves block cache settings, clears block cache if setting was changed.
-  if (isset($form_state['values']['block_cache'])) {
-    $name = 'facetapi:block_cache:' . $adapter->getSearcher();
-    // TODO This variable was probably removed in Backdrop without replacement.
-    $original = variable_get($name, BACKDROP_NO_CACHE);
-    // TODO This variable was probably removed in Backdrop without replacement.
-    variable_set($name, $form_state['values']['block_cache']);
-    if ($original != $form_state['values']['block_cache']) {
-      cache_clear_all(NULL, 'cache_block');
-    }
-  }
-
   // Clears delta map cache.
-  cache_clear_all('facetapi:delta_map', 'cache');
+  cache_clear_all();
 }
 
 /**
@@ -384,7 +344,6 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
   $path = backdrop_get_path('module', 'facetapi');
   backdrop_add_css($path . '/facetapi.admin.css', array('weight' => CSS_THEME - 1));
   backdrop_add_js($path . '/facetapi.admin.js');
-  // // cttools_include('plugins');
 
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
@@ -495,7 +454,7 @@ function facetapi_facet_display_form($form, &$form_state, FacetapiAdapter $adapt
   }
 
   // Orders the sorts by the default weights set above.
-  uasort($form['#facetapi']['sort_info'], 'backdrop_sort_weight');
+  uasort($form['#facetapi']['sort_info'], 'facetapi_sort_weight');
 
   // Builds checkbox options and weight dropboxes.
   $sort_options = array();
@@ -812,7 +771,6 @@ function theme_facetapi_sort_settings_table($variables) {
  * Form validation handler for facetapi_facet_display_form().
  */
 function facetapi_facet_display_form_validate($form, &$form_state) {
-  // // cttools_include('plugins');
   // Gets the selected query type and widget.
   $query_type = $form_state['values']['global']['query_type'];
   $widget_name = $form_state['values']['widget'];
@@ -846,7 +804,7 @@ function facetapi_facet_display_form_submit($form, &$form_state) {
   // Loads settings, saves all form values as settings other than excluded.
   $facet_settings = $adapter->getFacet($facet)->getSettings($realm);
   $facet_settings->settings = array_merge($facet_settings->settings, array_diff_key(
-    $form_state['values'], 
+    $form_state['values'],
     array_flip($form['#facetapi']['excluded_values'])
   ));
 
@@ -950,7 +908,7 @@ function facetapi_facet_filters_form($form, &$form_state, FacetapiAdapter $adapt
       );
     }
   }
-  uasort($plugins, 'backdrop_sort_weight');
+  uasort($plugins, 'facetapi_sort_weight');
 
   // Builds table, adds settings to vertical tabs.
   $has_settings = FALSE;
@@ -1135,10 +1093,6 @@ function facetapi_facet_filters_form_submit($form, &$form_state) {
  * @ingroup forms
  */
 function facetapi_facet_dependencies_form($form, &$form_state, FacetapiAdapter $adapter, array $realm, array $dependencies) {
-
-  // Ensure that the CTools plugin component is loaded.
-  // @see https://www.drupal.org/node/2122119
-  module_load_include('inc', 'ctools', 'includes/plugins');
 
   // We have to set the title due to contextual link magic.
   // @see http://drupal.org/node/1147588#comment-4428940
@@ -1383,13 +1337,13 @@ function facetapi_revert_form_submit($form, &$form_state) {
   // Reverts per-facet display settings.
   if ($form_state['values']['revert_facet']) {
     $facet_settings = $adapter->getFacetSettings($facet, $realm);
-    ctools_export_crud_delete('facetapi', $facet_settings);
+    facetapi_export_crud_delete('facetapi', $facet_settings);
   }
 
   // Reverts global settings if selected.
   if ($form_state['values']['revert_global']) {
     $global_settings = $adapter->getFacetSettingsGlobal($facet);
-    ctools_export_crud_delete('facetapi', $global_settings);
+    facetapi_export_crud_delete('facetapi', $global_settings);
   }
 
   // Sets message if both sets of configurations were saved.

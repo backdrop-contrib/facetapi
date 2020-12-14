@@ -32,10 +32,6 @@ function facetapi_get_block_info(array $realm_names) {
     // Gets delta map, iterates over all enabled facets.
     $map = facetapi_get_delta_map();
     foreach (facetapi_get_searcher_info() as $searcher => $info) {
-
-      // Gets cache settings for the searcher.
-      $cache = facetapi_get_block_cache_setting($searcher, $realm_name);
-
       // Adds blocks for facets that are enabled or whose delta mapping is forced.
       foreach (facetapi_get_delta_map_queue($searcher, $realm_name) as $facet_name) {
         if ($facet = facetapi_facet_load($facet_name, $searcher)) {
@@ -52,7 +48,6 @@ function facetapi_get_block_info(array $realm_names) {
           // Defines the block.
           $blocks[$delta] = array(
             'info' => $subject,
-            'cache' => $cache,
           );
         }
       }
@@ -73,28 +68,6 @@ function facetapi_ctools_block_info($module, $delta, &$info) {
   $info['category'] = t('Facet API');
   // Allow blocks to be used before the search results in Panels.
   $info['render last'] = TRUE;
-}
-
-/**
- * Returns block cache settings.
- *
- * @param $searcher
- *   The machine readable name of searcher.
- * @param string $realm_name
- *   The machine readable name of the realm.
- *
- * @return int
- *   The constants defined in includes/common.inc, defaults to BACKDROP_NO_CACHE.
- *
- * @see includes/common.inc
- */
-function facetapi_get_block_cache_setting($searcher, $realm_name) {
-  $name = 'facetapi:block_cache:' . $searcher;
-  if ('block' != $realm_name) {
-    $name .= ':' . $realm_name;
-  }
-  // TODO This variable was probably removed in Backdrop without replacement.
-  return variable_get($name, BACKDROP_NO_CACHE);
 }
 
 /**

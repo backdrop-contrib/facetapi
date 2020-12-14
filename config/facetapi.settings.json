@@ -1,5 +1,5 @@
 {
     "_config_name": "facetapi.settings",
-    "facetapiblock_cachesearcher": "dynamic variable in file /facetapi/facetapi.admin.inc line 153",
-    "facetapi:translator_module": "NULL"
+    "facetapi:translator_module": "",
+		"default_facetapi": []
 }
