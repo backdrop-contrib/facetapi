@@ -120,7 +120,7 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
 
       // The last item should be text, not a link.
       if ($last == $item) {
-        $breadcrumb[] = !empty($value['#html']) ? $value['#markup'] : check_plain($value['#markup']);
+        $breadcrumb[] = !empty($value['#html']) ? $value['#markup'] : '<span>' . check_plain($value['#markup']) . '</span>';
       }
       else {
         // Appends the filter to the breadcrumb trail.
