@@ -107,7 +107,7 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
     // Adds the current search to the query.
     if ($keys) {
       // The last item should be text, not a link.
-      $breadcrumb[] = $active_items ? l($keys, current_path(), array('query' => $query)) : check_plain($keys);
+      $breadcrumb[] = $active_items ? l($keys, current_path(), array('query' => $query)) : '<span aria-current="location">' . check_plain($keys) . '</span>';
     }
 
     // Adds filters to the breadcrumb trail.
@@ -120,7 +120,7 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
 
       // The last item should be text, not a link.
       if ($last == $item) {
-        $breadcrumb[] = !empty($value['#html']) ? $value['#markup'] : check_plain($value['#markup']);
+        $breadcrumb[] = !empty($value['#html']) ? $value['#markup'] : '<span aria-current="location">' . check_plain($value['#markup']) . '</span>';
       }
       else {
         // Appends the filter to the breadcrumb trail.
