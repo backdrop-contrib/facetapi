@@ -173,8 +173,8 @@ function facetapi_realm_settings_form_submit($form, &$form_state) {
     backdrop_set_message(t('The configuration options have been saved.'));
     if ('block' == $form['#facetapi']['realm']['name']) {
       backdrop_set_message(t(
-        'To enable or arrange the facet blocks, visit the <a href="@block-page">blocks administration page</a>.',
-        array('@block-page' => url('admin/structure/block', array('query' => array('destination' => current_path()))))
+        'To enable or arrange the facet blocks, add a block to a <a href="@layout-page">layout</a>.',
+        array('@layout-page' => url('admin/structure/layouts', array('query' => array('destination' => current_path()))))
       ));
     }
   }
