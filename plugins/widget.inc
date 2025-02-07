@@ -84,6 +84,13 @@ abstract class FacetapiWidget {
    */
   protected $jsSettings = array();
 
+   /**
+    * An array of the active sorting parameters.
+    *
+    * @var array
+    */
+  protected $sorts = array();
+
   /**
    * Constructs a FacetapiWidget object.
    *
