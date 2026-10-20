@@ -11,7 +11,7 @@
  * Adds the searcher visibility settings to the block form.
  */
 function current_search_form_block_admin_configure_alter(&$form, &$form_state) {
-  if ('current_search' == $form['module']['#value']) {
+  if ('current_search' == ($form['module']['#value'] ?? '')) {
 
     $form['visibility']['current_search'] = array(
       '#type' => 'fieldset',
