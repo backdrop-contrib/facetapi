@@ -104,33 +104,5 @@ td.facetapi-operations {
 }
 
 .facetapi-sort-table {
-  width: 55%;
-  float: right;
-  margin-top: -2em;
   padding: 0 1em 1em .5em;
-  position: relative;
-  z-index: 1000;
-}
-
-.form-item-widget select {
-  font-size: 120%;
-  margin-top: .3em;
-}
-
-.form-item-widget option {
-  padding-right: 1.5em;
-}
-
-.form-item-widget label {
-  font-size: 105%;
-}
-
-.facetapi-global-setting {
-  float: left;
-  width: 30%;
-  margin-right: 2em;
-}
-
-.facetapi-empty-setting {
-  clear: right;
 }
